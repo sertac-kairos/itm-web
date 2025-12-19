@@ -1,0 +1,215 @@
+<?php
+
+namespace App\Http\Controllers\API;
+
+use App\Http\Controllers\Controller;
+use App\Models\ArchaeologicalSite;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+
+class ArchaeologicalSiteController extends Controller
+{
+    public function index(Request $request): JsonResponse
+    {
+        $locale = $request->header('Accept-Language', app()->getLocale());
+        app()->setLocale($locale);
+
+        $query = ArchaeologicalSite::query()->active()
+            ->with(['translations', 'subRegion.translations', 'models3d' => function ($q) {
+                $q->where('is_active', true)->orderBy('sort_order')->with('translations');
+            }]);
+
+        if ($request->filled('sub_region_id')) {
+            $query->where('sub_region_id', $request->integer('sub_region_id'));
+        }
+
+        $sites = $query->get();
+
+        return response()->json([
+            'success' => true,
+            'locale' => $locale,
+            'data' => $sites->map(function (ArchaeologicalSite $site) {
+                return [
+                    'id' => $site->id,
+                    'sub_region' => [
+                        'id' => $site->subRegion?->id,
+                        'name' => $site->subRegion?->name,
+                    ],
+                    'name' => $site->name,
+                    'description' => $site->description,
+                    'latitude' => $site->latitude,
+                    'longitude' => $site->longitude,
+                    'image' => $site->image ? url('storage/' . $site->image) : null,
+                    'models_3d' => $site->models3d->map(function ($model) {
+                        return [
+                            'id' => $model->id,
+                            'name' => $model->name,
+                            'description' => $model->description,
+                            'sketchfab_model_id' => $model->sketchfab_model_id,
+                            'thumbnail' => $model->sketchfab_thumbnail_url,
+                            'sort_order' => $model->sort_order,
+                        ];
+                    }),
+                ];
+            }),
+        ]);
+    }
+
+    public function show(Request $request, ArchaeologicalSite $archaeologicalSite): JsonResponse
+    {
+        $locale = $request->header('Accept-Language', app()->getLocale());
+        app()->setLocale($locale);
+
+        if (!$archaeologicalSite->is_active) {
+            return response()->json(['success' => false, 'message' => 'Site not found or inactive'], 404);
+        }
+
+        $archaeologicalSite->load([
+            'translations',
+            'subRegion.translations',
+            'models3d' => function ($q) {
+                $q->where('is_active', true)->orderBy('sort_order')->with('translations');
+            },
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'locale' => $locale,
+            'data' => [
+                'id' => $archaeologicalSite->id,
+                'sub_region' => [
+                    'id' => $archaeologicalSite->subRegion?->id,
+                    'name' => $archaeologicalSite->subRegion?->name,
+                ],
+                'name' => $archaeologicalSite->name,
+                'description' => $archaeologicalSite->description,
+                'latitude' => $archaeologicalSite->latitude,
+                'longitude' => $archaeologicalSite->longitude,
+                'image' => $archaeologicalSite->image ? url('storage/' . $archaeologicalSite->image) : null,
+                'models_3d' => $archaeologicalSite->models3d->map(function ($model) {
+                    return [
+                        'id' => $model->id,
+                        'name' => $model->name,
+                        'description' => $model->description,
+                        'sketchfab_model_id' => $model->sketchfab_model_id,
+                        'thumbnail' => $model->sketchfab_thumbnail_url,
+                        'sort_order' => $model->sort_order,
+                    ];
+                }),
+            ],
+        ]);
+    }
+
+    /**
+     * Get archaeological sites by IDs with full data
+     * 
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function getByIds(Request $request): JsonResponse
+    {
+        $locale = $request->header('Accept-Language', app()->getLocale());
+        app()->setLocale($locale);
+
+        // Validate that ids parameter is provided and is an array
+        $request->validate([
+            'ids' => 'required|array|min:1',
+            'ids.*' => 'integer|exists:archaeological_sites,id'
+        ]);
+
+        $ids = $request->input('ids');
+
+        $sites = ArchaeologicalSite::whereIn('id', $ids)
+            ->active()
+            ->with([
+                'translations',
+                'subRegion.translations',
+                'subRegion.region.translations',
+                'models3d' => function ($q) {
+                    $q->where('is_active', true)
+                      ->orderBy('sort_order')
+                      ->with('translations');
+                },
+                'audioGuides' => function ($q) {
+                    $q->where('is_active', true)
+                      ->with('translations');
+                },
+                'qrCodes' => function ($q) {
+                    $q->where('is_active', true);
+                }
+            ])
+            ->get()
+            ->sortBy(function ($site) use ($ids) {
+                return array_search($site->id, $ids);
+            });
+
+        return response()->json([
+            'success' => true,
+            'locale' => $locale,
+            'data' => $sites->map(function (ArchaeologicalSite $site) {
+                return [
+                    'id' => $site->id,
+                    'sub_region' => [
+                        'id' => $site->subRegion?->id,
+                        'name' => $site->subRegion?->name,
+                        'description' => $site->subRegion?->description,
+                        'region' => [
+                            'id' => $site->subRegion?->region?->id,
+                            'name' => $site->subRegion?->region?->name,
+                            'description' => $site->subRegion?->region?->description,
+                        ],
+                    ],
+                    'name' => $site->name,
+                    'description' => $site->description,
+                    'latitude' => $site->latitude,
+                    'longitude' => $site->longitude,
+                    'image' => $site->image ? url('storage/' . $site->image) : null,
+                    'is_nearby_enabled' => $site->is_nearby_enabled,
+                    'is_active' => $site->is_active,
+                    'created_at' => $site->created_at,
+                    'updated_at' => $site->updated_at,
+                    'models_3d' => $site->models3d->map(function ($model) {
+                        return [
+                            'id' => $model->id,
+                            'name' => $model->name,
+                            'description' => $model->description,
+                            'sketchfab_model_id' => $model->sketchfab_model_id,
+                            'thumbnail' => $model->sketchfab_thumbnail_url,
+                            'qr_uuid' => $model->qr_uuid,
+                            'qr_image_path' => $model->qr_image_path ? url('storage/' . $model->qr_image_path) : null,
+                            'sort_order' => $model->sort_order,
+                            'is_active' => $model->is_active,
+                            'created_at' => $model->created_at,
+                            'updated_at' => $model->updated_at,
+                        ];
+                    }),
+                    'audio_guides' => $site->audioGuides->map(function ($audioGuide) {
+                        return [
+                            'id' => $audioGuide->id,
+                            'name' => $audioGuide->name,
+                            'description' => $audioGuide->description,
+                            'audio_file_path' => $audioGuide->audio_file_path ? url('storage/' . $audioGuide->audio_file_path) : null,
+                            'duration' => $audioGuide->duration,
+                            'sort_order' => $audioGuide->sort_order,
+                            'is_active' => $audioGuide->is_active,
+                            'created_at' => $audioGuide->created_at,
+                            'updated_at' => $audioGuide->updated_at,
+                        ];
+                    }),
+                    'qr_codes' => $site->qrCodes->map(function ($qrCode) {
+                        return [
+                            'id' => $qrCode->id,
+                            'uuid' => $qrCode->uuid,
+                            'qr_image_path' => $qrCode->qr_image_path ? url('storage/' . $qrCode->qr_image_path) : null,
+                            'is_active' => $qrCode->is_active,
+                            'created_at' => $qrCode->created_at,
+                            'updated_at' => $qrCode->updated_at,
+                        ];
+                    }),
+                ];
+            }),
+        ]);
+    }
+}
+
+

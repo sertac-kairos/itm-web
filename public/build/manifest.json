@@ -1,0 +1,639 @@
+{
+  "__commonjsHelpers-gnU0ypJ3.js": {
+    "file": "assets/_commonjsHelpers-gnU0ypJ3.js",
+    "name": "_commonjsHelpers"
+  },
+  "_apexcharts.esm-BofaT7g3.js": {
+    "file": "assets/apexcharts.esm-BofaT7g3.js",
+    "name": "apexcharts.esm"
+  },
+  "_dragula-C2qooCqJ.js": {
+    "file": "assets/dragula-C2qooCqJ.js",
+    "name": "dragula",
+    "imports": [
+      "__commonjsHelpers-gnU0ypJ3.js"
+    ]
+  },
+  "_index-2T3OL1fW.js": {
+    "file": "assets/index-2T3OL1fW.js",
+    "name": "index",
+    "imports": [
+      "_isObjectLike-vZHY8t3n.js"
+    ]
+  },
+  "_index-BEKk9TLb.js": {
+    "file": "assets/index-BEKk9TLb.js",
+    "name": "index"
+  },
+  "_isObjectLike-vZHY8t3n.js": {
+    "file": "assets/isObjectLike-vZHY8t3n.js",
+    "name": "isObjectLike"
+  },
+  "_jquery-DhZ2IzAu.js": {
+    "file": "assets/jquery-DhZ2IzAu.js",
+    "name": "jquery",
+    "imports": [
+      "__commonjsHelpers-gnU0ypJ3.js"
+    ]
+  },
+  "_moment-sgAgHLir.js": {
+    "file": "assets/moment-sgAgHLir.js",
+    "name": "moment"
+  },
+  "_quill-DA9vFidg.js": {
+    "file": "assets/quill-DA9vFidg.js",
+    "name": "quill",
+    "imports": [
+      "__commonjsHelpers-gnU0ypJ3.js",
+      "_isObjectLike-vZHY8t3n.js"
+    ]
+  },
+  "node_modules/choices.js/public/assets/styles/choices.min.css": {
+    "file": "assets/choices-CUxuSg5H.css",
+    "src": "node_modules/choices.js/public/assets/styles/choices.min.css",
+    "isEntry": true
+  },
+  "node_modules/datatables.net-bs5/css/dataTables.bootstrap5.min.css": {
+    "file": "assets/dataTables.bootstrap5-BymycBA4.css",
+    "src": "node_modules/datatables.net-bs5/css/dataTables.bootstrap5.min.css",
+    "isEntry": true
+  },
+  "node_modules/datatables.net-buttons-bs5/css/buttons.bootstrap5.min.css": {
+    "file": "assets/buttons.bootstrap5-DmDfXN9T.css",
+    "src": "node_modules/datatables.net-buttons-bs5/css/buttons.bootstrap5.min.css",
+    "isEntry": true
+  },
+  "node_modules/datatables.net-fixedcolumns-bs5/css/fixedColumns.bootstrap5.min.css": {
+    "file": "assets/fixedColumns.bootstrap5-2kvU8qDX.css",
+    "src": "node_modules/datatables.net-fixedcolumns-bs5/css/fixedColumns.bootstrap5.min.css",
+    "isEntry": true
+  },
+  "node_modules/datatables.net-fixedheader-bs5/css/fixedHeader.bootstrap5.min.css": {
+    "file": "assets/fixedHeader.bootstrap5-tIFjBxqL.css",
+    "src": "node_modules/datatables.net-fixedheader-bs5/css/fixedHeader.bootstrap5.min.css",
+    "isEntry": true
+  },
+  "node_modules/datatables.net-responsive-bs5/css/responsive.bootstrap5.min.css": {
+    "file": "assets/responsive.bootstrap5-CjUpA_nP.css",
+    "src": "node_modules/datatables.net-responsive-bs5/css/responsive.bootstrap5.min.css",
+    "isEntry": true
+  },
+  "node_modules/datatables.net-select-bs5/css/select.bootstrap5.min.css": {
+    "file": "assets/select.bootstrap5-Bh_wU73_.css",
+    "src": "node_modules/datatables.net-select-bs5/css/select.bootstrap5.min.css",
+    "isEntry": true
+  },
+  "node_modules/dropzone/dist/dropzone.css": {
+    "file": "assets/dropzone-CIgf0F6L.css",
+    "src": "node_modules/dropzone/dist/dropzone.css",
+    "isEntry": true
+  },
+  "node_modules/flatpickr/dist/flatpickr.min.css": {
+    "file": "assets/flatpickr-CksuuEqD.css",
+    "src": "node_modules/flatpickr/dist/flatpickr.min.css",
+    "isEntry": true
+  },
+  "node_modules/gridjs/dist/theme/mermaid.min.css": {
+    "file": "assets/mermaid-DH_3od9j.css",
+    "src": "node_modules/gridjs/dist/theme/mermaid.min.css",
+    "isEntry": true
+  },
+  "node_modules/jquery-toast-plugin/dist/jquery.toast.min.css": {
+    "file": "assets/jquery.toast-UHti9dpf.css",
+    "src": "node_modules/jquery-toast-plugin/dist/jquery.toast.min.css",
+    "isEntry": true
+  },
+  "node_modules/jsvectormap/dist/jsvectormap.min.css": {
+    "file": "assets/jsvectormap-DIsGouq0.css",
+    "src": "node_modules/jsvectormap/dist/jsvectormap.min.css",
+    "isEntry": true
+  },
+  "node_modules/leaflet/dist/images/layers-2x.png": {
+    "file": "assets/layers-2x-Bpkbi35X.png",
+    "src": "node_modules/leaflet/dist/images/layers-2x.png"
+  },
+  "node_modules/leaflet/dist/images/layers.png": {
+    "file": "assets/layers-BWBAp2CZ.png",
+    "src": "node_modules/leaflet/dist/images/layers.png"
+  },
+  "node_modules/leaflet/dist/images/marker-icon.png": {
+    "file": "assets/marker-icon-hN30_KVU.png",
+    "src": "node_modules/leaflet/dist/images/marker-icon.png"
+  },
+  "node_modules/leaflet/dist/leaflet.css": {
+    "file": "assets/leaflet-CLLlcC51.css",
+    "src": "node_modules/leaflet/dist/leaflet.css",
+    "isEntry": true
+  },
+  "node_modules/nouislider/dist/nouislider.min.css": {
+    "file": "assets/nouislider-DMCIR7Lv.css",
+    "src": "node_modules/nouislider/dist/nouislider.min.css",
+    "isEntry": true
+  },
+  "node_modules/quill/dist/quill.bubble.css": {
+    "file": "assets/quill-CiQi_d1P.css",
+    "src": "node_modules/quill/dist/quill.bubble.css",
+    "isEntry": true
+  },
+  "node_modules/quill/dist/quill.core.css": {
+    "file": "assets/quill-C2CmSnGx.css",
+    "src": "node_modules/quill/dist/quill.core.css",
+    "isEntry": true
+  },
+  "node_modules/quill/dist/quill.snow.css": {
+    "file": "assets/quill-7oN3-GhD.css",
+    "src": "node_modules/quill/dist/quill.snow.css",
+    "isEntry": true
+  },
+  "node_modules/select2/dist/css/select2.min.css": {
+    "file": "assets/select2-Dc_9RrAu.css",
+    "src": "node_modules/select2/dist/css/select2.min.css",
+    "isEntry": true
+  },
+  "node_modules/sweetalert2/dist/sweetalert2.css": {
+    "file": "assets/sweetalert2-wy2V7tgy.css",
+    "src": "node_modules/sweetalert2/dist/sweetalert2.css",
+    "isEntry": true
+  },
+  "public/images/bg-auth.png": {
+    "file": "assets/bg-auth-D-ViqD9q.png",
+    "src": "public/images/bg-auth.png"
+  },
+  "public/images/small/small-3.jpg": {
+    "file": "assets/small-3-B8tDKjAC.jpg",
+    "src": "public/images/small/small-3.jpg"
+  },
+  "resources/fonts/remixicon.eot": {
+    "file": "assets/remixicon-BeSuxUPl.eot",
+    "src": "resources/fonts/remixicon.eot"
+  },
+  "resources/fonts/remixicon.svg": {
+    "file": "assets/remixicon-D4vE9kYg.svg",
+    "src": "resources/fonts/remixicon.svg"
+  },
+  "resources/fonts/remixicon.ttf": {
+    "file": "assets/remixicon-BttEdIcK.ttf",
+    "src": "resources/fonts/remixicon.ttf"
+  },
+  "resources/fonts/remixicon.woff": {
+    "file": "assets/remixicon-BXYCkY-0.woff",
+    "src": "resources/fonts/remixicon.woff"
+  },
+  "resources/fonts/remixicon.woff2": {
+    "file": "assets/remixicon-BVUuWktn.woff2",
+    "src": "resources/fonts/remixicon.woff2"
+  },
+  "resources/fonts/tabler-icons.ttf": {
+    "file": "assets/tabler-icons-CzBzkdZH.ttf",
+    "src": "resources/fonts/tabler-icons.ttf"
+  },
+  "resources/fonts/tabler-icons.woff": {
+    "file": "assets/tabler-icons-B997weg5.woff",
+    "src": "resources/fonts/tabler-icons.woff"
+  },
+  "resources/fonts/tabler-icons.woff2": {
+    "file": "assets/tabler-icons-Zo3WWo8f.woff2",
+    "src": "resources/fonts/tabler-icons.woff2"
+  },
+  "resources/js/app.js": {
+    "file": "assets/app-DDk2hvos.js",
+    "name": "app",
+    "src": "resources/js/app.js",
+    "isEntry": true,
+    "imports": [
+      "_jquery-DhZ2IzAu.js",
+      "__commonjsHelpers-gnU0ypJ3.js",
+      "_index-BEKk9TLb.js",
+      "_index-2T3OL1fW.js",
+      "_isObjectLike-vZHY8t3n.js"
+    ]
+  },
+  "resources/js/components/articles-quilljs.js": {
+    "file": "assets/articles-quilljs-D8FknuBU.js",
+    "name": "articles-quilljs",
+    "src": "resources/js/components/articles-quilljs.js",
+    "isEntry": true,
+    "imports": [
+      "_quill-DA9vFidg.js",
+      "__commonjsHelpers-gnU0ypJ3.js",
+      "_isObjectLike-vZHY8t3n.js"
+    ]
+  },
+  "resources/js/components/chart-apex-area.js": {
+    "file": "assets/chart-apex-area-B_HO6RY5.js",
+    "name": "chart-apex-area",
+    "src": "resources/js/components/chart-apex-area.js",
+    "isEntry": true,
+    "imports": [
+      "_apexcharts.esm-BofaT7g3.js",
+      "_moment-sgAgHLir.js"
+    ]
+  },
+  "resources/js/components/chart-apex-bar.js": {
+    "file": "assets/chart-apex-bar-D4RJ2sAh.js",
+    "name": "chart-apex-bar",
+    "src": "resources/js/components/chart-apex-bar.js",
+    "isEntry": true,
+    "imports": [
+      "_apexcharts.esm-BofaT7g3.js"
+    ]
+  },
+  "resources/js/components/chart-apex-boxplot.js": {
+    "file": "assets/chart-apex-boxplot-3W8OH070.js",
+    "name": "chart-apex-boxplot",
+    "src": "resources/js/components/chart-apex-boxplot.js",
+    "isEntry": true,
+    "imports": [
+      "_apexcharts.esm-BofaT7g3.js"
+    ]
+  },
+  "resources/js/components/chart-apex-bubble.js": {
+    "file": "assets/chart-apex-bubble-NX-SlHbE.js",
+    "name": "chart-apex-bubble",
+    "src": "resources/js/components/chart-apex-bubble.js",
+    "isEntry": true,
+    "imports": [
+      "_apexcharts.esm-BofaT7g3.js"
+    ]
+  },
+  "resources/js/components/chart-apex-candlestick.js": {
+    "file": "assets/chart-apex-candlestick-D4RsVJf-.js",
+    "name": "chart-apex-candlestick",
+    "src": "resources/js/components/chart-apex-candlestick.js",
+    "isEntry": true,
+    "imports": [
+      "_apexcharts.esm-BofaT7g3.js"
+    ]
+  },
+  "resources/js/components/chart-apex-column.js": {
+    "file": "assets/chart-apex-column-BySuFhaE.js",
+    "name": "chart-apex-column",
+    "src": "resources/js/components/chart-apex-column.js",
+    "isEntry": true,
+    "imports": [
+      "_apexcharts.esm-BofaT7g3.js"
+    ]
+  },
+  "resources/js/components/chart-apex-funnel.js": {
+    "file": "assets/chart-apex-funnel-Ba8jaTNW.js",
+    "name": "chart-apex-funnel",
+    "src": "resources/js/components/chart-apex-funnel.js",
+    "isEntry": true,
+    "imports": [
+      "_apexcharts.esm-BofaT7g3.js"
+    ]
+  },
+  "resources/js/components/chart-apex-heatmap.js": {
+    "file": "assets/chart-apex-heatmap-EVUYR429.js",
+    "name": "chart-apex-heatmap",
+    "src": "resources/js/components/chart-apex-heatmap.js",
+    "isEntry": true,
+    "imports": [
+      "_apexcharts.esm-BofaT7g3.js"
+    ]
+  },
+  "resources/js/components/chart-apex-line.js": {
+    "file": "assets/chart-apex-line-r22dgz7v.js",
+    "name": "chart-apex-line",
+    "src": "resources/js/components/chart-apex-line.js",
+    "isEntry": true,
+    "imports": [
+      "_apexcharts.esm-BofaT7g3.js"
+    ]
+  },
+  "resources/js/components/chart-apex-mixed.js": {
+    "file": "assets/chart-apex-mixed-Rhcdf7DH.js",
+    "name": "chart-apex-mixed",
+    "src": "resources/js/components/chart-apex-mixed.js",
+    "isEntry": true,
+    "imports": [
+      "_apexcharts.esm-BofaT7g3.js"
+    ]
+  },
+  "resources/js/components/chart-apex-pie.js": {
+    "file": "assets/chart-apex-pie-ozwhASEj.js",
+    "name": "chart-apex-pie",
+    "src": "resources/js/components/chart-apex-pie.js",
+    "isEntry": true,
+    "imports": [
+      "_apexcharts.esm-BofaT7g3.js"
+    ]
+  },
+  "resources/js/components/chart-apex-polar-area.js": {
+    "file": "assets/chart-apex-polar-area-CmrhMuXZ.js",
+    "name": "chart-apex-polar-area",
+    "src": "resources/js/components/chart-apex-polar-area.js",
+    "isEntry": true,
+    "imports": [
+      "_apexcharts.esm-BofaT7g3.js"
+    ]
+  },
+  "resources/js/components/chart-apex-radar.js": {
+    "file": "assets/chart-apex-radar-B-0ud_6V.js",
+    "name": "chart-apex-radar",
+    "src": "resources/js/components/chart-apex-radar.js",
+    "isEntry": true,
+    "imports": [
+      "_apexcharts.esm-BofaT7g3.js"
+    ]
+  },
+  "resources/js/components/chart-apex-radialbar.js": {
+    "file": "assets/chart-apex-radialbar-BMjQ_BgR.js",
+    "name": "chart-apex-radialbar",
+    "src": "resources/js/components/chart-apex-radialbar.js",
+    "isEntry": true,
+    "imports": [
+      "_apexcharts.esm-BofaT7g3.js"
+    ]
+  },
+  "resources/js/components/chart-apex-scatter.js": {
+    "file": "assets/chart-apex-scatter-DlESmtPQ.js",
+    "name": "chart-apex-scatter",
+    "src": "resources/js/components/chart-apex-scatter.js",
+    "isEntry": true,
+    "imports": [
+      "_apexcharts.esm-BofaT7g3.js"
+    ]
+  },
+  "resources/js/components/chart-apex-slope.js": {
+    "file": "assets/chart-apex-slope-Bjdja7gP.js",
+    "name": "chart-apex-slope",
+    "src": "resources/js/components/chart-apex-slope.js",
+    "isEntry": true,
+    "imports": [
+      "_apexcharts.esm-BofaT7g3.js"
+    ]
+  },
+  "resources/js/components/chart-apex-sparklines.js": {
+    "file": "assets/chart-apex-sparklines--OWc9On3.js",
+    "name": "chart-apex-sparklines",
+    "src": "resources/js/components/chart-apex-sparklines.js",
+    "isEntry": true,
+    "imports": [
+      "_apexcharts.esm-BofaT7g3.js"
+    ]
+  },
+  "resources/js/components/chart-apex-timeline.js": {
+    "file": "assets/chart-apex-timeline-CU6pEL4k.js",
+    "name": "chart-apex-timeline",
+    "src": "resources/js/components/chart-apex-timeline.js",
+    "isEntry": true,
+    "imports": [
+      "_apexcharts.esm-BofaT7g3.js",
+      "_moment-sgAgHLir.js"
+    ]
+  },
+  "resources/js/components/chart-apex-treemap.js": {
+    "file": "assets/chart-apex-treemap-DfiFuS2y.js",
+    "name": "chart-apex-treemap",
+    "src": "resources/js/components/chart-apex-treemap.js",
+    "isEntry": true,
+    "imports": [
+      "_apexcharts.esm-BofaT7g3.js"
+    ]
+  },
+  "resources/js/components/extended-dragula.js": {
+    "file": "assets/extended-dragula-ktppvENu.js",
+    "name": "extended-dragula",
+    "src": "resources/js/components/extended-dragula.js",
+    "isEntry": true,
+    "imports": [
+      "_dragula-C2qooCqJ.js",
+      "__commonjsHelpers-gnU0ypJ3.js"
+    ]
+  },
+  "resources/js/components/extended-range-slider.js": {
+    "file": "assets/extended-range-slider-BdsNu3lP.js",
+    "name": "extended-range-slider",
+    "src": "resources/js/components/extended-range-slider.js",
+    "isEntry": true,
+    "imports": [
+      "__commonjsHelpers-gnU0ypJ3.js"
+    ]
+  },
+  "resources/js/components/extended-rating.js": {
+    "file": "assets/extended-rating-D0BwOSTI.js",
+    "name": "extended-rating",
+    "src": "resources/js/components/extended-rating.js",
+    "isEntry": true,
+    "imports": [
+      "__commonjsHelpers-gnU0ypJ3.js"
+    ]
+  },
+  "resources/js/components/extended-sweetalerts.js": {
+    "file": "assets/extended-sweetalerts-XTVf_bap.js",
+    "name": "extended-sweetalerts",
+    "src": "resources/js/components/extended-sweetalerts.js",
+    "isEntry": true
+  },
+  "resources/js/components/form-fileupload.js": {
+    "file": "assets/form-fileupload-Cpcl2_39.js",
+    "name": "form-fileupload",
+    "src": "resources/js/components/form-fileupload.js",
+    "isEntry": true
+  },
+  "resources/js/components/form-inputmask.js": {
+    "file": "assets/form-inputmask-l0sNRNKZ.js",
+    "name": "form-inputmask",
+    "src": "resources/js/components/form-inputmask.js",
+    "isEntry": true
+  },
+  "resources/js/components/form-quilljs.js": {
+    "file": "assets/form-quilljs-CyyVqUWd.js",
+    "name": "form-quilljs",
+    "src": "resources/js/components/form-quilljs.js",
+    "isEntry": true,
+    "imports": [
+      "_quill-DA9vFidg.js",
+      "__commonjsHelpers-gnU0ypJ3.js",
+      "_isObjectLike-vZHY8t3n.js"
+    ]
+  },
+  "resources/js/components/form-wizard.js": {
+    "file": "assets/form-wizard-CDtA4dqT.js",
+    "name": "form-wizard",
+    "src": "resources/js/components/form-wizard.js",
+    "isEntry": true
+  },
+  "resources/js/components/maps-google.js": {
+    "file": "assets/maps-google-Bbj-8V-S.js",
+    "name": "maps-google",
+    "src": "resources/js/components/maps-google.js",
+    "isEntry": true,
+    "imports": [
+      "__commonjsHelpers-gnU0ypJ3.js"
+    ]
+  },
+  "resources/js/components/maps-leaflet.js": {
+    "file": "assets/maps-leaflet-CFXImJeW.js",
+    "name": "maps-leaflet",
+    "src": "resources/js/components/maps-leaflet.js",
+    "isEntry": true,
+    "imports": [
+      "__commonjsHelpers-gnU0ypJ3.js",
+      "resources/js/maps/leaflet-data.js"
+    ]
+  },
+  "resources/js/components/maps-vector.js": {
+    "file": "assets/maps-vector-C9Glw-pJ.js",
+    "name": "maps-vector",
+    "src": "resources/js/components/maps-vector.js",
+    "isEntry": true,
+    "imports": [
+      "__commonjsHelpers-gnU0ypJ3.js"
+    ]
+  },
+  "resources/js/components/table-datatable.js": {
+    "file": "assets/table-datatable-CE7Bfu51.js",
+    "name": "table-datatable",
+    "src": "resources/js/components/table-datatable.js",
+    "isEntry": true,
+    "imports": [
+      "_jquery-DhZ2IzAu.js",
+      "__commonjsHelpers-gnU0ypJ3.js"
+    ]
+  },
+  "resources/js/components/table-gridjs.js": {
+    "file": "assets/table-gridjs-KbOKYTUQ.js",
+    "name": "table-gridjs",
+    "src": "resources/js/components/table-gridjs.js",
+    "isEntry": true,
+    "imports": [
+      "__commonjsHelpers-gnU0ypJ3.js"
+    ]
+  },
+  "resources/js/config.js": {
+    "file": "assets/config-LSYrJu-Q.js",
+    "name": "config",
+    "src": "resources/js/config.js",
+    "isEntry": true
+  },
+  "resources/js/maps/canada.js": {
+    "file": "assets/canada-Btz07hSk.js",
+    "name": "canada",
+    "src": "resources/js/maps/canada.js",
+    "isEntry": true
+  },
+  "resources/js/maps/in-mill-en.js": {
+    "file": "assets/in-mill-en-CpJL5ffs.js",
+    "name": "in-mill-en",
+    "src": "resources/js/maps/in-mill-en.js",
+    "isEntry": true
+  },
+  "resources/js/maps/iraq.js": {
+    "file": "assets/iraq-B39VGenj.js",
+    "name": "iraq",
+    "src": "resources/js/maps/iraq.js",
+    "isEntry": true
+  },
+  "resources/js/maps/leaflet-data.js": {
+    "file": "assets/leaflet-data-DauGkOBc.js",
+    "name": "leaflet-data",
+    "src": "resources/js/maps/leaflet-data.js",
+    "isEntry": true
+  },
+  "resources/js/maps/russia.js": {
+    "file": "assets/russia-C3XucoMP.js",
+    "name": "russia",
+    "src": "resources/js/maps/russia.js",
+    "isEntry": true
+  },
+  "resources/js/maps/spain.js": {
+    "file": "assets/spain-CdBIHB66.js",
+    "name": "spain",
+    "src": "resources/js/maps/spain.js",
+    "isEntry": true
+  },
+  "resources/js/maps/us-aea-en.js": {
+    "file": "assets/us-aea-en-zFZVBgqA.js",
+    "name": "us-aea-en",
+    "src": "resources/js/maps/us-aea-en.js",
+    "isEntry": true
+  },
+  "resources/js/maps/us-lcc-en.js": {
+    "file": "assets/us-lcc-en-CZaBBw_y.js",
+    "name": "us-lcc-en",
+    "src": "resources/js/maps/us-lcc-en.js",
+    "isEntry": true
+  },
+  "resources/js/maps/us-mill-en.js": {
+    "file": "assets/us-mill-en-DTiFO-dH.js",
+    "name": "us-mill-en",
+    "src": "resources/js/maps/us-mill-en.js",
+    "isEntry": true
+  },
+  "resources/js/pages/apps-calendar.js": {
+    "file": "assets/apps-calendar-BfJXrwBs.js",
+    "name": "apps-calendar",
+    "src": "resources/js/pages/apps-calendar.js",
+    "isEntry": true,
+    "imports": [
+      "_index-BEKk9TLb.js"
+    ]
+  },
+  "resources/js/pages/apps-chat.js": {
+    "file": "assets/apps-chat-CaErgSpP.js",
+    "name": "apps-chat",
+    "src": "resources/js/pages/apps-chat.js",
+    "isEntry": true,
+    "imports": [
+      "_index-2T3OL1fW.js",
+      "_isObjectLike-vZHY8t3n.js"
+    ]
+  },
+  "resources/js/pages/apps-email.js": {
+    "file": "assets/apps-email-DvWlcnZB.js",
+    "name": "apps-email",
+    "src": "resources/js/pages/apps-email.js",
+    "isEntry": true,
+    "imports": [
+      "_quill-DA9vFidg.js",
+      "__commonjsHelpers-gnU0ypJ3.js",
+      "_isObjectLike-vZHY8t3n.js"
+    ]
+  },
+  "resources/js/pages/apps-kanban.js": {
+    "file": "assets/apps-kanban-ktppvENu.js",
+    "name": "apps-kanban",
+    "src": "resources/js/pages/apps-kanban.js",
+    "isEntry": true,
+    "imports": [
+      "_dragula-C2qooCqJ.js",
+      "__commonjsHelpers-gnU0ypJ3.js"
+    ]
+  },
+  "resources/js/pages/coming-soon.js": {
+    "file": "assets/coming-soon-oiEV_chF.js",
+    "name": "coming-soon",
+    "src": "resources/js/pages/coming-soon.js",
+    "isEntry": true
+  },
+  "resources/js/pages/dashboard.js": {
+    "file": "assets/dashboard-Ca8gIXrs.js",
+    "name": "dashboard",
+    "src": "resources/js/pages/dashboard.js",
+    "isEntry": true,
+    "imports": [
+      "_apexcharts.esm-BofaT7g3.js"
+    ]
+  },
+  "resources/js/pages/widgets.js": {
+    "file": "assets/widgets-BdVD4VY7.js",
+    "name": "widgets",
+    "src": "resources/js/pages/widgets.js",
+    "isEntry": true,
+    "imports": [
+      "_apexcharts.esm-BofaT7g3.js"
+    ]
+  },
+  "resources/scss/app.scss": {
+    "file": "assets/app-DKLIPvfS.css",
+    "src": "resources/scss/app.scss",
+    "isEntry": true
+  },
+  "resources/scss/icons.scss": {
+    "file": "assets/icons-r6laq6CU.css",
+    "src": "resources/scss/icons.scss",
+    "isEntry": true
+  }
+}

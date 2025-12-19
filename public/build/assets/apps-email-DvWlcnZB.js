@@ -1,0 +1,1 @@
+import{Q as e}from"./quill-DA9vFidg.js";import"./_commonjsHelpers-gnU0ypJ3.js";import"./isObjectLike-vZHY8t3n.js";new e("#mail-compose",{modules:{toolbar:[[{header:[1,2,!1]}],["bold","italic","underline"],["image","code-block"]]},placeholder:"Compose an epic...",theme:"snow"});
