@@ -91,7 +91,7 @@ class ArticleController extends Controller
         $article = Article::create([
             'author' => $request->author,
             'sort_order' => $request->sort_order,
-            'is_active' => $request->boolean('is_active', true),
+            'is_active' => $request->boolean('is_active', false),
         ]);
 
         // Handle translations
@@ -183,7 +183,7 @@ class ArticleController extends Controller
         $article->update([
             'author' => $request->author,
             'sort_order' => $request->sort_order,
-            'is_active' => $request->boolean('is_active', true),
+            'is_active' => $request->boolean('is_active', false),
         ]);
 
         // Handle translations

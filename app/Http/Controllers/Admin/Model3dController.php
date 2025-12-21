@@ -102,7 +102,7 @@ class Model3dController extends Controller
             'sketchfab_model_id' => $request->sketchfab_model_id,
             'sketchfab_thumbnail_url' => $request->sketchfab_thumbnail_url,
             'sort_order' => $request->sort_order,
-            'is_active' => $request->has('is_active') ? $request->boolean('is_active') : false,
+            'is_active' => $request->boolean('is_active', false),
         ]);
 
         // Save translations
@@ -215,7 +215,7 @@ class Model3dController extends Controller
             'sketchfab_model_id' => $request->sketchfab_model_id,
             'sketchfab_thumbnail_url' => $request->sketchfab_thumbnail_url,
             'sort_order' => $request->sort_order,
-            'is_active' => $request->has('is_active') ? $request->boolean('is_active') : false,
+            'is_active' => $request->boolean('is_active', false),
         ]);
 
         // Update translations

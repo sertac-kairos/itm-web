@@ -94,7 +94,7 @@ class StoryController extends Controller
         $story = Story::create([
             'thumbnail' => $thumbnailPath,
             'sort_order' => $request->sort_order,
-            'is_active' => $request->boolean('is_active', true),
+            'is_active' => $request->boolean('is_active', false),
             'model_3d_id' => $request->model_3d_id,
         ]);
 
@@ -189,7 +189,7 @@ class StoryController extends Controller
 
         $story->update([
             'sort_order' => $request->sort_order,
-            'is_active' => $request->boolean('is_active', true),
+            'is_active' => $request->boolean('is_active', false),
             'model_3d_id' => $request->model_3d_id,
         ]);
 

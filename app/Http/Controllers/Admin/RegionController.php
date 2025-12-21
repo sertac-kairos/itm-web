@@ -82,7 +82,7 @@ class RegionController extends Controller
         $region = new Region();
         $region->color_code = $request->color_code;
         $region->sort_order = $request->sort_order;
-        $region->is_active = $request->boolean('is_active', true);
+        $region->is_active = $request->boolean('is_active', false);
         $region->latitude = $request->filled('latitude') ? $request->latitude : null;
         $region->longitude = $request->filled('longitude') ? $request->longitude : null;
         $region->hotspot_image = $request->filled('hotspot_image') ? json_decode($request->hotspot_image, true) : null;
@@ -183,7 +183,7 @@ class RegionController extends Controller
 
         $region->color_code = $request->color_code;
         $region->sort_order = $request->sort_order;
-        $region->is_active = $request->boolean('is_active', true);
+        $region->is_active = $request->boolean('is_active', false);
         $region->latitude = $request->filled('latitude') ? $request->latitude : null;
         $region->longitude = $request->filled('longitude') ? $request->longitude : null;
         $region->hotspot_image = $request->filled('hotspot_image') ? json_decode($request->hotspot_image, true) : null;

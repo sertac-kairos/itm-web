@@ -136,8 +136,8 @@ class ArchaeologicalSiteController extends Controller
         $archaeologicalSite->sub_region_id = $request->sub_region_id;
         $archaeologicalSite->latitude = $request->latitude;
         $archaeologicalSite->longitude = $request->longitude;
-        $archaeologicalSite->is_nearby_enabled = $request->has('is_nearby_enabled') ? $request->boolean('is_nearby_enabled') : false;
-        $archaeologicalSite->is_active = $request->has('is_active') ? $request->boolean('is_active') : false;
+        $archaeologicalSite->is_nearby_enabled = $request->boolean('is_nearby_enabled', false);
+        $archaeologicalSite->is_active = $request->boolean('is_active', false);
 
         // Handle image upload
         if ($request->hasFile('image')) {
@@ -267,8 +267,8 @@ class ArchaeologicalSiteController extends Controller
         $archaeologicalSite->sub_region_id = $request->sub_region_id;
         $archaeologicalSite->latitude = $request->latitude;
         $archaeologicalSite->longitude = $request->longitude;
-        $archaeologicalSite->is_nearby_enabled = $request->has('is_nearby_enabled') ? $request->boolean('is_nearby_enabled') : false;
-        $archaeologicalSite->is_active = $request->has('is_active') ? $request->boolean('is_active') : false;
+        $archaeologicalSite->is_nearby_enabled = $request->boolean('is_nearby_enabled', false);
+        $archaeologicalSite->is_active = $request->boolean('is_active', false);
 
         // Handle image upload
         if ($request->hasFile('image')) {

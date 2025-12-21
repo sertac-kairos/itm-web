@@ -101,7 +101,7 @@ class MemoryController extends Controller
             'link' => $request->link,
             'author' => $request->author,
             'sort_order' => $request->sort_order,
-            'is_active' => $request->boolean('is_active', true),
+            'is_active' => $request->boolean('is_active', false),
         ]);
 
         // Handle translations
@@ -187,7 +187,7 @@ class MemoryController extends Controller
             'link' => $request->link,
             'author' => $request->author,
             'sort_order' => $request->sort_order,
-            'is_active' => $request->boolean('is_active', true),
+            'is_active' => $request->boolean('is_active', false),
         ]);
 
         // Handle translations

@@ -106,7 +106,7 @@ class NewsController extends Controller
             'slug' => $slug,
             'news_date' => $request->news_date,
             'sort_order' => $request->sort_order,
-            'is_active' => $request->boolean('is_active', true),
+            'is_active' => $request->boolean('is_active', false),
         ]);
 
         // Handle translations with auto-translation
@@ -203,7 +203,7 @@ class NewsController extends Controller
             'slug' => $slug,
             'news_date' => $request->news_date,
             'sort_order' => $request->sort_order,
-            'is_active' => $request->boolean('is_active', true),
+            'is_active' => $request->boolean('is_active', false),
         ]);
 
         // Handle translations with auto-translation

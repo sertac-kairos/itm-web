@@ -76,7 +76,7 @@ class OnboardingSlideController extends Controller
 
         $slide = OnboardingSlide::create([
             'sort_order' => $request->sort_order,
-            'is_active' => $request->boolean('is_active', true),
+            'is_active' => $request->boolean('is_active', false),
         ]);
 
         foreach (config('translatable.locales') as $locale) {
@@ -174,7 +174,7 @@ class OnboardingSlideController extends Controller
         }
 
         $onboardingSlide->sort_order = $request->sort_order;
-        $onboardingSlide->is_active = $request->boolean('is_active', true);
+        $onboardingSlide->is_active = $request->boolean('is_active', false);
         $onboardingSlide->save();
 
         foreach (config('translatable.locales') as $locale) {
