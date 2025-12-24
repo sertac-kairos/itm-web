@@ -41,6 +41,7 @@ class Model3dController extends Controller
                     'sort_order' => $model->sort_order,
                     'qr_uuid' => $model->qr_uuid,
                     'qr_image_url' => $model->qr_image_path ? url('storage/'.$model->qr_image_path) : null,
+                    'audio_guide_path' => $model->archaeologicalSite?->audio_guide_path ? url('storage/' . $model->archaeologicalSite->audio_guide_path) : null,
                 ];
             }),
         ]);
@@ -73,6 +74,7 @@ class Model3dController extends Controller
                 'sort_order' => $model3d->sort_order,
                 'qr_uuid' => $model3d->qr_uuid,
                 'qr_image_url' => $model3d->qr_image_path ? url('storage/'.$model3d->qr_image_path) : null,
+                'audioGuide' => $model3d->archaeologicalSite?->audio_guide_path ? url('storage/' . $model3d->archaeologicalSite->audio_guide_path) : null,
             ],
         ]);
     }
@@ -137,6 +139,7 @@ class Model3dController extends Controller
                     'updated_at' => $model->updated_at,
                     'name' => $model->name,
                     'description' => $model->description,
+                    'audio_guide_path' => $model->archaeologicalSite?->audio_guide_path ? url('storage/' . $model->archaeologicalSite->audio_guide_path) : null,
                     'archaeological_site' => [
                         'id' => $model->archaeologicalSite?->id,
                         'name' => $model->archaeologicalSite?->name,

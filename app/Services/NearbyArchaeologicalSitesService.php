@@ -31,7 +31,9 @@ class NearbyArchaeologicalSitesService
             ->whereRaw("{$haversine} <= ?", [$latitude, $longitude, $latitude, $maxDistanceKm])
             ->orderBy('distance')
             ->limit($limit)
-            ->with(['subRegion.region', 'translations'])
+            ->with(['subRegion.region', 'translations', 'models3d' => function ($q) {
+                $q->where('is_active', true)->orderBy('sort_order')->with('translations');
+            }])
             ->get();
 
         return $sites;
@@ -89,7 +91,7 @@ class NearbyArchaeologicalSitesService
                 'image' => $site->image ? url('storage/' . $site->image) : null,
                 'distance_km' => round($site->distance, 2),
                 'distance_m' => round($site->distance * 1000, 0),
-                'models_3d' => $site->models3d->map(function ($model) {
+                'models_3d' => $site->models3d->map(function ($model) use ($site) {
                     return [
                         'id' => $model->id,
                         'name' => $model->name,
@@ -97,6 +99,7 @@ class NearbyArchaeologicalSitesService
                         'sketchfab_model_id' => $model->sketchfab_model_id,
                         'thumbnail' => $model->sketchfab_thumbnail_url,
                         'sort_order' => $model->sort_order,
+                        'audio_guide_path' => $site->audio_guide_path ? url('storage/' . $site->audio_guide_path) : null,
                     ];
                 }),
             ];

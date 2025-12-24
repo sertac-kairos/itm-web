@@ -40,7 +40,7 @@ class ArchaeologicalSiteController extends Controller
                     'latitude' => $site->latitude,
                     'longitude' => $site->longitude,
                     'image' => $site->image ? url('storage/' . $site->image) : null,
-                    'models_3d' => $site->models3d->map(function ($model) {
+                    'models_3d' => $site->models3d->map(function ($model) use ($site) {
                         return [
                             'id' => $model->id,
                             'name' => $model->name,
@@ -48,6 +48,7 @@ class ArchaeologicalSiteController extends Controller
                             'sketchfab_model_id' => $model->sketchfab_model_id,
                             'thumbnail' => $model->sketchfab_thumbnail_url,
                             'sort_order' => $model->sort_order,
+                            'audio_guide_path' => $site->audio_guide_path ? url('storage/' . $site->audio_guide_path) : null,
                         ];
                     }),
                 ];
@@ -86,7 +87,7 @@ class ArchaeologicalSiteController extends Controller
                 'latitude' => $archaeologicalSite->latitude,
                 'longitude' => $archaeologicalSite->longitude,
                 'image' => $archaeologicalSite->image ? url('storage/' . $archaeologicalSite->image) : null,
-                'models_3d' => $archaeologicalSite->models3d->map(function ($model) {
+                'models_3d' => $archaeologicalSite->models3d->map(function ($model) use ($archaeologicalSite) {
                     return [
                         'id' => $model->id,
                         'name' => $model->name,
@@ -94,6 +95,7 @@ class ArchaeologicalSiteController extends Controller
                         'sketchfab_model_id' => $model->sketchfab_model_id,
                         'thumbnail' => $model->sketchfab_thumbnail_url,
                         'sort_order' => $model->sort_order,
+                        'audio_guide_path' => $archaeologicalSite->audio_guide_path ? url('storage/' . $archaeologicalSite->audio_guide_path) : null,
                     ];
                 }),
             ],
@@ -168,7 +170,7 @@ class ArchaeologicalSiteController extends Controller
                     'is_active' => $site->is_active,
                     'created_at' => $site->created_at,
                     'updated_at' => $site->updated_at,
-                    'models_3d' => $site->models3d->map(function ($model) {
+                    'models_3d' => $site->models3d->map(function ($model) use ($site) {
                         return [
                             'id' => $model->id,
                             'name' => $model->name,
@@ -181,6 +183,7 @@ class ArchaeologicalSiteController extends Controller
                             'is_active' => $model->is_active,
                             'created_at' => $model->created_at,
                             'updated_at' => $model->updated_at,
+                            'audio_guide_path' => $site->audio_guide_path ? url('storage/' . $site->audio_guide_path) : null,
                         ];
                     }),
                     'audio_guides' => $site->audioGuides->map(function ($audioGuide) {

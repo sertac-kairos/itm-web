@@ -25,6 +25,7 @@ class ArchaeologicalSite extends Model implements TranslatableContract
     public $translatedAttributes = [
         'name',
         'description',
+        'audio_guide_path',
     ];
 
     protected $casts = [

@@ -52,7 +52,7 @@ class SubRegionController extends Controller
                             'latitude' => $site->latitude,
                             'longitude' => $site->longitude,
                             'image' => $site->image ? url('storage/' . $site->image) : null,
-                            'models_3d' => $site->models3d->map(function ($model) {
+                            'models_3d' => $site->models3d->map(function ($model) use ($site) {
                                 return [
                                     'id' => $model->id,
                                     'name' => $model->name,
@@ -60,6 +60,7 @@ class SubRegionController extends Controller
                                     'sketchfab_model_id' => $model->sketchfab_model_id,
                                     'thumbnail' => $model->sketchfab_thumbnail_url,
                                     'sort_order' => $model->sort_order,
+                                    'audio_guide_path' => $site->audio_guide_path ? url('storage/' . $site->audio_guide_path) : null,
                                 ];
                             }),
                         ];
@@ -117,7 +118,7 @@ class SubRegionController extends Controller
                         'latitude' => $site->latitude,
                         'longitude' => $site->longitude,
                         'image' => $site->image ? url('storage/' . $site->image) : null,
-                        'models_3d' => $site->models3d->map(function ($model) {
+                        'models_3d' => $site->models3d->map(function ($model) use ($site) {
                             return [
                                 'id' => $model->id,
                                 'name' => $model->name,
@@ -125,6 +126,7 @@ class SubRegionController extends Controller
                                 'sketchfab_model_id' => $model->sketchfab_model_id,
                                 'thumbnail' => $model->sketchfab_thumbnail_url,
                                 'sort_order' => $model->sort_order,
+                                'audio_guide_path' => $site->audio_guide_path ? url('storage/' . $site->audio_guide_path) : null,
                             ];
                         }),
                     ];
@@ -194,7 +196,7 @@ class SubRegionController extends Controller
                             'latitude' => $site->latitude,
                             'longitude' => $site->longitude,
                             'image' => $site->image ? url('storage/' . $site->image) : null,
-                            'models_3d' => $site->models3d->map(function ($model) {
+                            'models_3d' => $site->models3d->map(function ($model) use ($site) {
                                 return [
                                     'id' => $model->id,
                                     'name' => $model->name,
@@ -202,6 +204,7 @@ class SubRegionController extends Controller
                                     'sketchfab_model_id' => $model->sketchfab_model_id,
                                     'thumbnail' => $model->sketchfab_thumbnail_url,
                                     'sort_order' => $model->sort_order,
+                                    'audio_guide_path' => $site->audio_guide_path ? url('storage/' . $site->audio_guide_path) : null,
                                 ];
                             }),
                         ];

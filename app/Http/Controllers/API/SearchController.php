@@ -31,7 +31,7 @@ class SearchController extends Controller
         $searchTerm = $request->input('q');
         $searchTerm = urldecode($searchTerm);
         $searchTerm = trim($searchTerm);
-        $searchTerm = preg_replace('/\s+/', ' ', $searchTerm); 
+        $searchTerm = preg_replace('/\s+/', ' ', $searchTerm);
         
         if (strlen($searchTerm) < 2) {
             return response()->json([

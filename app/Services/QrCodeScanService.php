@@ -90,7 +90,7 @@ class QrCodeScanService
                         'latitude' => $archaeologicalSite->latitude,
                         'longitude' => $archaeologicalSite->longitude,
                         'image' => $archaeologicalSite->image ? url('storage/' . $archaeologicalSite->image) : null,
-                        'models_3d' => $archaeologicalSite->models3d->map(function ($model) {
+                        'models_3d' => $archaeologicalSite->models3d->map(function ($model) use ($archaeologicalSite) {
                             return [
                                 'id' => $model->id,
                                 'name' => $model->name,
@@ -98,6 +98,7 @@ class QrCodeScanService
                                 'sketchfab_model_id' => $model->sketchfab_model_id,
                                 'thumbnail' => $model->sketchfab_thumbnail_url,
                                 'sort_order' => $model->sort_order,
+                                'audio_guide_path' => $archaeologicalSite->audio_guide_path ? url('storage/' . $archaeologicalSite->audio_guide_path) : null,
                             ];
                         }),
                     ]
