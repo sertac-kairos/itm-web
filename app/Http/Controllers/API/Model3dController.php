@@ -12,8 +12,7 @@ class Model3dController extends Controller
 {
     public function index(Request $request): JsonResponse
     {
-        $locale = $request->header('Accept-Language', app()->getLocale());
-        app()->setLocale($locale);
+        $locale = app()->getLocale();
 
         $query = Model3d::query()->where('is_active', true)->orderBy('sort_order')
             ->with(['translations', 'archaeologicalSite.translations']);
@@ -27,15 +26,18 @@ class Model3dController extends Controller
         return response()->json([
             'success' => true,
             'locale' => $locale,
-            'data' => $models->map(function (Model3d $model) {
+            'data' => $models->map(function (Model3d $model) use ($locale) {
+                $modelTranslation = $model->translate($locale);
+                $siteTranslation = $model->archaeologicalSite?->translate($locale);
+                
                 return [
                     'id' => $model->id,
                     'archaeological_site' => [
                         'id' => $model->archaeologicalSite?->id,
-                        'name' => $model->archaeologicalSite?->name,
+                        'name' => $siteTranslation?->name ?? '',
                     ],
-                    'name' => $model->name,
-                    'description' => $model->description,
+                    'name' => $modelTranslation?->name ?? '',
+                    'description' => $modelTranslation?->description ?? '',
                     'sketchfab_model_id' => $model->sketchfab_model_id,
                     'thumbnail' => $model->sketchfab_thumbnail_url,
                     'sort_order' => $model->sort_order,
@@ -49,14 +51,16 @@ class Model3dController extends Controller
 
     public function show(Request $request, Model3d $model3d): JsonResponse
     {
-        $locale = $request->header('Accept-Language', app()->getLocale());
-        app()->setLocale($locale);
+        $locale = app()->getLocale();
 
         if (!$model3d->is_active) {
             return response()->json(['success' => false, 'message' => 'Model not found or inactive'], 404);
         }
 
         $model3d->load(['translations', 'archaeologicalSite.translations']);
+        
+        $modelTranslation = $model3d->translate($locale);
+        $siteTranslation = $model3d->archaeologicalSite?->translate($locale);
 
         return response()->json([
             'success' => true,
@@ -65,10 +69,10 @@ class Model3dController extends Controller
                 'id' => $model3d->id,
                 'archaeological_site' => [
                     'id' => $model3d->archaeologicalSite?->id,
-                    'name' => $model3d->archaeologicalSite?->name,
+                    'name' => $siteTranslation?->name ?? '',
                 ],
-                'name' => $model3d->name,
-                'description' => $model3d->description,
+                'name' => $modelTranslation?->name ?? '',
+                'description' => $modelTranslation?->description ?? '',
                 'sketchfab_model_id' => $model3d->sketchfab_model_id,
                 'thumbnail' => $model3d->sketchfab_thumbnail_url,
                 'sort_order' => $model3d->sort_order,
@@ -87,8 +91,7 @@ class Model3dController extends Controller
      */
     public function getByIds(Request $request): JsonResponse
     {
-        $locale = $request->header('Accept-Language', app()->getLocale());
-        app()->setLocale($locale);
+        $locale = app()->getLocale();
 
         // Validate that ids parameter is provided and is an array
         $validated = $request->validate([
@@ -124,7 +127,14 @@ class Model3dController extends Controller
         return response()->json([
             'success' => true,
             'locale' => $locale,
-            'data' => $models->map(function (Model3d $model) {
+            'data' => $models->map(function (Model3d $model) use ($locale) {
+                $modelTranslation = $model->translate($locale);
+                $siteTranslation = $model->archaeologicalSite?->translate($locale);
+                $archSubRegionTranslation = $model->archaeologicalSite?->subRegion?->translate($locale);
+                $archRegionTranslation = $model->archaeologicalSite?->subRegion?->region?->translate($locale);
+                $subRegionTranslation = $model->subRegion?->translate($locale);
+                $regionTranslation = $model->subRegion?->region?->translate($locale);
+                
                 return [
                     'id' => $model->id,
                     'sub_region_id' => $model->sub_region_id,
@@ -137,13 +147,13 @@ class Model3dController extends Controller
                     'is_active' => $model->is_active,
                     'created_at' => $model->created_at,
                     'updated_at' => $model->updated_at,
-                    'name' => $model->name,
-                    'description' => $model->description,
+                    'name' => $modelTranslation?->name ?? '',
+                    'description' => $modelTranslation?->description ?? '',
                     'audio_guide_path' => $model->archaeologicalSite?->audio_guide_path ? url('storage/' . $model->archaeologicalSite->audio_guide_path) : null,
                     'archaeological_site' => [
                         'id' => $model->archaeologicalSite?->id,
-                        'name' => $model->archaeologicalSite?->name,
-                        'description' => $model->archaeologicalSite?->description,
+                        'name' => $siteTranslation?->name ?? '',
+                        'description' => $siteTranslation?->description ?? '',
                         'latitude' => $model->archaeologicalSite?->latitude,
                         'longitude' => $model->archaeologicalSite?->longitude,
                         'image' => $model->archaeologicalSite?->image ? url('storage/' . $model->archaeologicalSite?->image) : null,
@@ -151,23 +161,23 @@ class Model3dController extends Controller
                         'is_active' => $model->archaeologicalSite?->is_active,
                         'sub_region' => [
                             'id' => $model->archaeologicalSite?->subRegion?->id,
-                            'name' => $model->archaeologicalSite?->subRegion?->name,
-                            'description' => $model->archaeologicalSite?->subRegion?->description,
+                            'name' => $archSubRegionTranslation?->name ?? '',
+                            'description' => $archSubRegionTranslation?->description ?? '',
                             'region' => [
                                 'id' => $model->archaeologicalSite?->subRegion?->region?->id,
-                                'name' => $model->archaeologicalSite?->subRegion?->region?->name,
-                                'description' => $model->archaeologicalSite?->subRegion?->region?->description,
+                                'name' => $archRegionTranslation?->name ?? '',
+                                'description' => $archRegionTranslation?->description ?? '',
                             ],
                         ],
                     ],
                     'sub_region' => [
                         'id' => $model->subRegion?->id,
-                        'name' => $model->subRegion?->name,
-                        'description' => $model->subRegion?->description,
+                        'name' => $subRegionTranslation?->name ?? '',
+                        'description' => $subRegionTranslation?->description ?? '',
                         'region' => [
                             'id' => $model->subRegion?->region?->id,
-                            'name' => $model->subRegion?->region?->name,
-                            'description' => $model->subRegion?->region?->description,
+                            'name' => $regionTranslation?->name ?? '',
+                            'description' => $regionTranslation?->description ?? '',
                         ],
                     ],
                 ];
@@ -184,8 +194,7 @@ class Model3dController extends Controller
      */
     public function getModelFileUrl(Request $request, string $sketchfabId): JsonResponse
     {
-        $locale = $request->header('Accept-Language', app()->getLocale());
-        app()->setLocale($locale);
+        $locale = app()->getLocale();
 
         $sketchfabService = new SketchfabService();
         $result = $sketchfabService->getModelFileUrl($sketchfabId);

@@ -13,8 +13,11 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->append(\App\Http\Middleware\EnsureAdminExists::class);
-        // Apply signature check only to API routes
-        $middleware->api(append: [\App\Http\Middleware\VerifyAppSignature::class]);
+        // Apply signature check and locale parsing to API routes
+        $middleware->api(append: [
+            \App\Http\Middleware\SetLocaleFromHeader::class,
+            \App\Http\Middleware\VerifyAppSignature::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         $exceptions->render(function (Illuminate\Auth\AuthenticationException $e, $request) {

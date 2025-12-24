@@ -11,8 +11,7 @@ class ArchaeologicalSiteController extends Controller
 {
     public function index(Request $request): JsonResponse
     {
-        $locale = $request->header('Accept-Language', app()->getLocale());
-        app()->setLocale($locale);
+        $locale = app()->getLocale();
 
         $query = ArchaeologicalSite::query()->active()
             ->with(['translations', 'subRegion.translations', 'models3d' => function ($q) {
@@ -28,23 +27,28 @@ class ArchaeologicalSiteController extends Controller
         return response()->json([
             'success' => true,
             'locale' => $locale,
-            'data' => $sites->map(function (ArchaeologicalSite $site) {
+            'data' => $sites->map(function (ArchaeologicalSite $site) use ($locale) {
+                $siteTranslation = $site->translate($locale);
+                $subRegionTranslation = $site->subRegion?->translate($locale);
+                
                 return [
                     'id' => $site->id,
                     'sub_region' => [
                         'id' => $site->subRegion?->id,
-                        'name' => $site->subRegion?->name,
+                        'name' => $subRegionTranslation?->name ?? '',
                     ],
-                    'name' => $site->name,
-                    'description' => $site->description,
+                    'name' => $siteTranslation?->name ?? '',
+                    'description' => $siteTranslation?->description ?? '',
                     'latitude' => $site->latitude,
                     'longitude' => $site->longitude,
                     'image' => $site->image ? url('storage/' . $site->image) : null,
-                    'models_3d' => $site->models3d->map(function ($model) use ($site) {
+                    'models_3d' => $site->models3d->map(function ($model) use ($site, $locale) {
+                        $modelTranslation = $model->translate($locale);
+                        
                         return [
                             'id' => $model->id,
-                            'name' => $model->name,
-                            'description' => $model->description,
+                            'name' => $modelTranslation?->name ?? '',
+                            'description' => $modelTranslation?->description ?? '',
                             'sketchfab_model_id' => $model->sketchfab_model_id,
                             'thumbnail' => $model->sketchfab_thumbnail_url,
                             'sort_order' => $model->sort_order,
@@ -58,8 +62,7 @@ class ArchaeologicalSiteController extends Controller
 
     public function show(Request $request, ArchaeologicalSite $archaeologicalSite): JsonResponse
     {
-        $locale = $request->header('Accept-Language', app()->getLocale());
-        app()->setLocale($locale);
+        $locale = app()->getLocale();
 
         if (!$archaeologicalSite->is_active) {
             return response()->json(['success' => false, 'message' => 'Site not found or inactive'], 404);
@@ -73,6 +76,9 @@ class ArchaeologicalSiteController extends Controller
             },
         ]);
 
+        $siteTranslation = $archaeologicalSite->translate($locale);
+        $subRegionTranslation = $archaeologicalSite->subRegion?->translate($locale);
+        
         return response()->json([
             'success' => true,
             'locale' => $locale,
@@ -80,18 +86,20 @@ class ArchaeologicalSiteController extends Controller
                 'id' => $archaeologicalSite->id,
                 'sub_region' => [
                     'id' => $archaeologicalSite->subRegion?->id,
-                    'name' => $archaeologicalSite->subRegion?->name,
+                    'name' => $subRegionTranslation?->name ?? '',
                 ],
-                'name' => $archaeologicalSite->name,
-                'description' => $archaeologicalSite->description,
+                'name' => $siteTranslation?->name ?? '',
+                'description' => $siteTranslation?->description ?? '',
                 'latitude' => $archaeologicalSite->latitude,
                 'longitude' => $archaeologicalSite->longitude,
                 'image' => $archaeologicalSite->image ? url('storage/' . $archaeologicalSite->image) : null,
-                'models_3d' => $archaeologicalSite->models3d->map(function ($model) use ($archaeologicalSite) {
+                'models_3d' => $archaeologicalSite->models3d->map(function ($model) use ($archaeologicalSite, $locale) {
+                    $modelTranslation = $model->translate($locale);
+                    
                     return [
                         'id' => $model->id,
-                        'name' => $model->name,
-                        'description' => $model->description,
+                        'name' => $modelTranslation?->name ?? '',
+                        'description' => $modelTranslation?->description ?? '',
                         'sketchfab_model_id' => $model->sketchfab_model_id,
                         'thumbnail' => $model->sketchfab_thumbnail_url,
                         'sort_order' => $model->sort_order,
@@ -110,8 +118,7 @@ class ArchaeologicalSiteController extends Controller
      */
     public function getByIds(Request $request): JsonResponse
     {
-        $locale = $request->header('Accept-Language', app()->getLocale());
-        app()->setLocale($locale);
+        $locale = app()->getLocale();
 
         // Validate that ids parameter is provided and is an array
         $request->validate([
@@ -148,21 +155,25 @@ class ArchaeologicalSiteController extends Controller
         return response()->json([
             'success' => true,
             'locale' => $locale,
-            'data' => $sites->map(function (ArchaeologicalSite $site) {
+            'data' => $sites->map(function (ArchaeologicalSite $site) use ($locale) {
+                $siteTranslation = $site->translate($locale);
+                $subRegionTranslation = $site->subRegion?->translate($locale);
+                $regionTranslation = $site->subRegion?->region?->translate($locale);
+                
                 return [
                     'id' => $site->id,
                     'sub_region' => [
                         'id' => $site->subRegion?->id,
-                        'name' => $site->subRegion?->name,
-                        'description' => $site->subRegion?->description,
+                        'name' => $subRegionTranslation?->name ?? '',
+                        'description' => $subRegionTranslation?->description ?? '',
                         'region' => [
                             'id' => $site->subRegion?->region?->id,
-                            'name' => $site->subRegion?->region?->name,
-                            'description' => $site->subRegion?->region?->description,
+                            'name' => $regionTranslation?->name ?? '',
+                            'description' => $regionTranslation?->description ?? '',
                         ],
                     ],
-                    'name' => $site->name,
-                    'description' => $site->description,
+                    'name' => $siteTranslation?->name ?? '',
+                    'description' => $siteTranslation?->description ?? '',
                     'latitude' => $site->latitude,
                     'longitude' => $site->longitude,
                     'image' => $site->image ? url('storage/' . $site->image) : null,
@@ -170,11 +181,13 @@ class ArchaeologicalSiteController extends Controller
                     'is_active' => $site->is_active,
                     'created_at' => $site->created_at,
                     'updated_at' => $site->updated_at,
-                    'models_3d' => $site->models3d->map(function ($model) use ($site) {
+                    'models_3d' => $site->models3d->map(function ($model) use ($site, $locale) {
+                        $modelTranslation = $model->translate($locale);
+                        
                         return [
                             'id' => $model->id,
-                            'name' => $model->name,
-                            'description' => $model->description,
+                            'name' => $modelTranslation?->name ?? '',
+                            'description' => $modelTranslation?->description ?? '',
                             'sketchfab_model_id' => $model->sketchfab_model_id,
                             'thumbnail' => $model->sketchfab_thumbnail_url,
                             'qr_uuid' => $model->qr_uuid,
@@ -186,11 +199,13 @@ class ArchaeologicalSiteController extends Controller
                             'audio_guide_path' => $site->audio_guide_path ? url('storage/' . $site->audio_guide_path) : null,
                         ];
                     }),
-                    'audio_guides' => $site->audioGuides->map(function ($audioGuide) {
+                    'audio_guides' => $site->audioGuides->map(function ($audioGuide) use ($locale) {
+                        $audioGuideTranslation = $audioGuide->translate($locale);
+                        
                         return [
                             'id' => $audioGuide->id,
-                            'name' => $audioGuide->name,
-                            'description' => $audioGuide->description,
+                            'name' => $audioGuideTranslation?->name ?? '',
+                            'description' => $audioGuideTranslation?->description ?? '',
                             'audio_file_path' => $audioGuide->audio_file_path ? url('storage/' . $audioGuide->audio_file_path) : null,
                             'duration' => $audioGuide->duration,
                             'sort_order' => $audioGuide->sort_order,

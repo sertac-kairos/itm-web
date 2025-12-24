@@ -11,8 +11,7 @@ class SubRegionController extends Controller
 {
     public function index(Request $request): JsonResponse
     {
-        $locale = $request->header('Accept-Language', app()->getLocale());
-        app()->setLocale($locale);
+        $locale = app()->getLocale();
 
         $query = SubRegion::query()->active()->ordered()
             ->with(['translations', 'region.translations', 'archaeologicalSites' => function ($q) {
@@ -30,33 +29,40 @@ class SubRegionController extends Controller
         return response()->json([
             'success' => true,
             'locale' => $locale,
-            'data' => $subRegions->map(function (SubRegion $subRegion) {
+            'data' => $subRegions->map(function (SubRegion $subRegion) use ($locale) {
+                $subTranslation = $subRegion->translate($locale);
+                $regionTranslation = $subRegion->region?->translate($locale);
+                
                 return [
                     'id' => $subRegion->id,
                     'region_id' => $subRegion->region_id,
-                    'region_name' => $subRegion->region?->name,
-                    'name' => $subRegion->name,
-                    'subtitle' => $subRegion->subtitle,
-                    'description' => $subRegion->description,
+                    'region_name' => $regionTranslation?->name ?? '',
+                    'name' => $subTranslation?->name ?? '',
+                    'subtitle' => $subTranslation?->subtitle ?? '',
+                    'description' => $subTranslation?->description ?? '',
                     'latitude' => $subRegion->latitude,
                     'longitude' => $subRegion->longitude,
                     'image' => $subRegion->image ? url('storage/' . $subRegion->image) : null,
                     'color' => $subRegion->color ?? '#1a4a9f',
                     'audio_guide' => $subRegion->audio_guide_path ? url('storage/' . $subRegion->audio_guide_path) : null,
                     'sort_order' => $subRegion->sort_order,
-                    'archaeological_sites' => $subRegion->archaeologicalSites->map(function ($site) {
+                    'archaeological_sites' => $subRegion->archaeologicalSites->map(function ($site) use ($locale) {
+                        $siteTranslation = $site->translate($locale);
+                        
                         return [
                             'id' => $site->id,
-                            'name' => $site->name,
-                            'description' => $site->description,
+                            'name' => $siteTranslation?->name ?? '',
+                            'description' => $siteTranslation?->description ?? '',
                             'latitude' => $site->latitude,
                             'longitude' => $site->longitude,
                             'image' => $site->image ? url('storage/' . $site->image) : null,
-                            'models_3d' => $site->models3d->map(function ($model) use ($site) {
+                            'models_3d' => $site->models3d->map(function ($model) use ($site, $locale) {
+                                $modelTranslation = $model->translate($locale);
+                                
                                 return [
                                     'id' => $model->id,
-                                    'name' => $model->name,
-                                    'description' => $model->description,
+                                    'name' => $modelTranslation?->name ?? '',
+                                    'description' => $modelTranslation?->description ?? '',
                                     'sketchfab_model_id' => $model->sketchfab_model_id,
                                     'thumbnail' => $model->sketchfab_thumbnail_url,
                                     'sort_order' => $model->sort_order,
@@ -72,8 +78,7 @@ class SubRegionController extends Controller
 
     public function show(Request $request, SubRegion $subRegion): JsonResponse
     {
-        $locale = $request->header('Accept-Language', app()->getLocale());
-        app()->setLocale($locale);
+        $locale = app()->getLocale();
 
         if (!$subRegion->is_active) {
             return response()->json(['success' => false, 'message' => 'Sub-region not found or inactive'], 404);
@@ -92,6 +97,9 @@ class SubRegionController extends Controller
             },
         ]);
 
+        $subTranslation = $subRegion->translate($locale);
+        $regionTranslation = $subRegion->region?->translate($locale);
+        
         return response()->json([
             'success' => true,
             'locale' => $locale,
@@ -99,30 +107,34 @@ class SubRegionController extends Controller
                 'id' => $subRegion->id,
                 'region' => [
                     'id' => $subRegion->region?->id,
-                    'name' => $subRegion->region?->name,
+                    'name' => $regionTranslation?->name ?? '',
                 ],
-                'name' => $subRegion->name,
-                'subtitle' => $subRegion->subtitle,
-                'description' => $subRegion->description,
+                'name' => $subTranslation?->name ?? '',
+                'subtitle' => $subTranslation?->subtitle ?? '',
+                'description' => $subTranslation?->description ?? '',
                 'latitude' => $subRegion->latitude,
                 'longitude' => $subRegion->longitude,
                 'image' => $subRegion->image ? url('storage/' . $subRegion->image) : null,
                 'color' => $subRegion->color ?? '#1a4a9f',
                 'audio_guide' => $subRegion->audio_guide_path ? url('storage/' . $subRegion->audio_guide_path) : null,
                 'sort_order' => $subRegion->sort_order,
-                'archaeological_sites' => $subRegion->archaeologicalSites->map(function ($site) {
+                'archaeological_sites' => $subRegion->archaeologicalSites->map(function ($site) use ($locale) {
+                    $siteTranslation = $site->translate($locale);
+                    
                     return [
                         'id' => $site->id,
-                        'name' => $site->name,
-                        'description' => $site->description,
+                        'name' => $siteTranslation?->name ?? '',
+                        'description' => $siteTranslation?->description ?? '',
                         'latitude' => $site->latitude,
                         'longitude' => $site->longitude,
                         'image' => $site->image ? url('storage/' . $site->image) : null,
-                        'models_3d' => $site->models3d->map(function ($model) use ($site) {
+                        'models_3d' => $site->models3d->map(function ($model) use ($site, $locale) {
+                            $modelTranslation = $model->translate($locale);
+                            
                             return [
                                 'id' => $model->id,
-                                'name' => $model->name,
-                                'description' => $model->description,
+                                'name' => $modelTranslation?->name ?? '',
+                                'description' => $modelTranslation?->description ?? '',
                                 'sketchfab_model_id' => $model->sketchfab_model_id,
                                 'thumbnail' => $model->sketchfab_thumbnail_url,
                                 'sort_order' => $model->sort_order,
@@ -143,8 +155,7 @@ class SubRegionController extends Controller
      */
     public function getByIds(Request $request): JsonResponse
     {
-        $locale = $request->header('Accept-Language', app()->getLocale());
-        app()->setLocale($locale);
+        $locale = app()->getLocale();
 
         // Validate that ids parameter is provided and is an array
         $request->validate([
@@ -174,33 +185,40 @@ class SubRegionController extends Controller
         return response()->json([
             'success' => true,
             'locale' => $locale,
-            'data' => $subRegions->map(function (SubRegion $subRegion) {
+            'data' => $subRegions->map(function (SubRegion $subRegion) use ($locale) {
+                $subTranslation = $subRegion->translate($locale);
+                $regionTranslation = $subRegion->region?->translate($locale);
+                
                 return [
                     'id' => $subRegion->id,
                     'region_id' => $subRegion->region_id,
-                    'region_name' => $subRegion->region?->name,
-                    'name' => $subRegion->name,
-                    'subtitle' => $subRegion->subtitle,
-                    'description' => $subRegion->description,
+                    'region_name' => $regionTranslation?->name ?? '',
+                    'name' => $subTranslation?->name ?? '',
+                    'subtitle' => $subTranslation?->subtitle ?? '',
+                    'description' => $subTranslation?->description ?? '',
                     'latitude' => $subRegion->latitude,
                     'longitude' => $subRegion->longitude,
                     'image' => $subRegion->image ? url('storage/' . $subRegion->image) : null,
                     'color' => $subRegion->color ?? '#1a4a9f',
                     'audio_guide' => $subRegion->audio_guide_path ? url('storage/' . $subRegion->audio_guide_path) : null,
                     'sort_order' => $subRegion->sort_order,
-                    'archaeological_sites' => $subRegion->archaeologicalSites->map(function ($site) {
+                    'archaeological_sites' => $subRegion->archaeologicalSites->map(function ($site) use ($locale) {
+                        $siteTranslation = $site->translate($locale);
+                        
                         return [
                             'id' => $site->id,
-                            'name' => $site->name,
-                            'description' => $site->description,
+                            'name' => $siteTranslation?->name ?? '',
+                            'description' => $siteTranslation?->description ?? '',
                             'latitude' => $site->latitude,
                             'longitude' => $site->longitude,
                             'image' => $site->image ? url('storage/' . $site->image) : null,
-                            'models_3d' => $site->models3d->map(function ($model) use ($site) {
+                            'models_3d' => $site->models3d->map(function ($model) use ($site, $locale) {
+                                $modelTranslation = $model->translate($locale);
+                                
                                 return [
                                     'id' => $model->id,
-                                    'name' => $model->name,
-                                    'description' => $model->description,
+                                    'name' => $modelTranslation?->name ?? '',
+                                    'description' => $modelTranslation?->description ?? '',
                                     'sketchfab_model_id' => $model->sketchfab_model_id,
                                     'thumbnail' => $model->sketchfab_thumbnail_url,
                                     'sort_order' => $model->sort_order,

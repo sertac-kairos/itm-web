@@ -33,11 +33,7 @@ class ArticleController extends Controller
         // Get articles ordered by sort order
         $articles = $query->ordered()->get();
 
-        // Transform data for API response
-        $articlesData = $articles->map(function ($article) use ($request) {
-            $locale = $request->header('Accept-Language', config('translatable.fallback_locale'));
-            $translation = $article->translate($locale, false);
-            
+        $articlesData = $articles->map(function ($article) {
             return [
                 'id' => $article->id,
                 'author' => $article->author,
@@ -45,8 +41,8 @@ class ArticleController extends Controller
                 'is_active' => $article->is_active,
                 'created_at' => $article->created_at->toISOString(),
                 'updated_at' => $article->updated_at->toISOString(),
-                'title' => $translation->title ?? null,
-                'content' => $translation->content ?? null,
+                'title' => $article->title ?: '',
+                'content' => $article->content ?: '',
                 'images' => $article->images->map(function ($image) {
                     return [
                         'id' => $image->id,
@@ -56,7 +52,7 @@ class ArticleController extends Controller
                     ];
                 }),
                 'images_count' => $article->images_count,
-                'locale' => $locale,
+                'locale' => app()->getLocale(),
                 'available_translations' => $article->translations->pluck('locale')->toArray(),
             ];
         });
@@ -66,7 +62,7 @@ class ArticleController extends Controller
             'data' => $articlesData,
             'meta' => [
                 'total' => $articlesData->count(),
-                'locale' => $request->header('Accept-Language', config('translatable.fallback_locale')),
+                'locale' => app()->getLocale(),
             ]
         ]);
     }
@@ -83,8 +79,8 @@ class ArticleController extends Controller
             ], 404);
         }
 
-        $locale = $request->header('Accept-Language', config('translatable.fallback_locale'));
-        $translation = $article->translate($locale, false);
+        $locale = app()->getLocale();
+        $translation = $article->translate($locale);
 
         $articleData = [
             'id' => $article->id,
@@ -104,7 +100,7 @@ class ArticleController extends Controller
                 ];
             }),
             'images_count' => $article->images_count,
-            'locale' => $locale,
+            'locale' => app()->getLocale(),
             'available_translations' => $article->translations->pluck('locale')->toArray(),
         ];
 
@@ -112,7 +108,7 @@ class ArticleController extends Controller
             'success' => true,
             'data' => $articleData,
             'meta' => [
-                'locale' => $locale,
+                'locale' => app()->getLocale(),
             ]
         ]);
     }
@@ -125,8 +121,7 @@ class ArticleController extends Controller
      */
     public function getByIds(Request $request): JsonResponse
     {
-        $locale = $request->header('Accept-Language', config('translatable.fallback_locale'));
-        app()->setLocale($locale);
+        $locale = app()->getLocale();
 
         // Validate that ids parameter is provided and is an array
         $request->validate([
@@ -148,8 +143,8 @@ class ArticleController extends Controller
             });
 
             $articlesData = $articles->map(function ($article) use ($request) {
-                $locale = $request->header('Accept-Language', config('translatable.fallback_locale'));
-                $translation = $article->translate($locale, false);
+        $locale = app()->getLocale();
+                $translation = $article->translate($locale);
                 
                 return [
                     'id' => $article->id,
@@ -169,7 +164,7 @@ class ArticleController extends Controller
                         ];
                     }),
                     'images_count' => $article->images_count,
-                    'locale' => $locale,
+                    'locale' => app()->getLocale(),
                     'available_translations' => $article->translations->pluck('locale')->toArray(),
                 ];
             });
@@ -179,7 +174,7 @@ class ArticleController extends Controller
                 'data' => $articlesData,
                 'meta' => [
                     'total' => $articlesData->count(),
-                    'locale' => $request->header('Accept-Language', config('translatable.fallback_locale')),
+                    'locale' => app()->getLocale(),
                 ]
             ]);
     }

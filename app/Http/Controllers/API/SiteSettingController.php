@@ -16,10 +16,9 @@ class SiteSettingController extends Controller
     public function index(Request $request): JsonResponse
     {
         // Get locale from request header or default to app locale
-        $locale = $request->header('Accept-Language', app()->getLocale());
+        $locale = app()->getLocale();
         
         // Set application locale for this request
-        app()->setLocale($locale);
 
         // Get all settings
         $settings = [

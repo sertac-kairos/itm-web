@@ -37,11 +37,7 @@ class MemoryController extends Controller
         // Get memories ordered by sort order
         $memories = $query->ordered()->get();
 
-        // Transform data for API response
-        $memoriesData = $memories->map(function ($memory) use ($request) {
-            $locale = $request->header('Accept-Language', config('translatable.fallback_locale'));
-            $translation = $memory->translate($locale, false);
-            
+        $memoriesData = $memories->map(function ($memory) {
             return [
                 'id' => $memory->id,
                 'image' => $memory->image_url,
@@ -52,9 +48,9 @@ class MemoryController extends Controller
                 'is_active' => $memory->is_active,
                 'created_at' => $memory->created_at->toISOString(),
                 'updated_at' => $memory->updated_at->toISOString(),
-                'title' => $translation->title ?? null,
-                'content' => $translation->content ?? null,
-                'locale' => $locale,
+                'title' => $memory->title ?: '',
+                'content' => $memory->content ?: '',
+                'locale' => app()->getLocale(),
                 'available_translations' => $memory->translations->pluck('locale')->toArray(),
             ];
         });
@@ -64,7 +60,7 @@ class MemoryController extends Controller
             'data' => $memoriesData,
             'meta' => [
                 'total' => $memoriesData->count(),
-                'locale' => $request->header('Accept-Language', config('translatable.fallback_locale')),
+                'locale' => app()->getLocale(),
             ]
         ]);
     }
@@ -81,9 +77,6 @@ class MemoryController extends Controller
             ], 404);
         }
 
-        $locale = $request->header('Accept-Language', config('translatable.fallback_locale'));
-        $translation = $memory->translate($locale, false);
-
         $memoryData = [
             'id' => $memory->id,
             'image' => $memory->image_url,
@@ -93,19 +86,19 @@ class MemoryController extends Controller
             'is_active' => $memory->is_active,
             'created_at' => $memory->created_at->toISOString(),
             'updated_at' => $memory->updated_at->toISOString(),
-            'title' => $translation->title ?? null,
-            'content' => $translation->content ?? null,
-            'locale' => $locale,
+            'title' => $memory->title ?: '',
+            'content' => $memory->content ?: '',
+            'locale' => app()->getLocale(),
             'available_translations' => $memory->translations->pluck('locale')->toArray(),
         ];
 
-        return response()->json([
-            'success' => true,
-            'data' => $memoryData,
-            'meta' => [
-                'locale' => $locale,
-            ]
-        ]);
+            return response()->json([
+                'success' => true,
+                'data' => $memoryData,
+                'meta' => [
+                    'locale' => app()->getLocale(),
+                ]
+            ]);
     }
 
     /**
@@ -116,8 +109,7 @@ class MemoryController extends Controller
      */
     public function getByIds(Request $request): JsonResponse
     {
-        $locale = $request->header('Accept-Language', config('translatable.fallback_locale'));
-        app()->setLocale($locale);
+        $locale = app()->getLocale();
 
         // Validate that ids parameter is provided and is an array
         $request->validate([
@@ -137,10 +129,7 @@ class MemoryController extends Controller
                 return array_search($memory->id, $ids);
             });
 
-        $memoriesData = $memories->map(function ($memory) use ($request) {
-            $locale = $request->header('Accept-Language', config('translatable.fallback_locale'));
-            $translation = $memory->translate($locale, false);
-            
+        $memoriesData = $memories->map(function ($memory) {
             return [
                 'id' => $memory->id,
                 'image' => $memory->image_url,
@@ -151,9 +140,9 @@ class MemoryController extends Controller
                 'is_active' => $memory->is_active,
                 'created_at' => $memory->created_at->toISOString(),
                 'updated_at' => $memory->updated_at->toISOString(),
-                'title' => $translation->title ?? null,
-                'content' => $translation->content ?? null,
-                'locale' => $locale,
+                'title' => $memory->title ?: '',
+                'content' => $memory->content ?: '',
+                'locale' => app()->getLocale(),
                 'available_translations' => $memory->translations->pluck('locale')->toArray(),
             ];
         });
@@ -163,7 +152,7 @@ class MemoryController extends Controller
             'data' => $memoriesData,
             'meta' => [
                 'total' => $memoriesData->count(),
-                'locale' => $request->header('Accept-Language', config('translatable.fallback_locale')),
+                'locale' => app()->getLocale(),
             ]
         ]);
     }

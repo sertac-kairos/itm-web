@@ -27,7 +27,7 @@ class NearbyArchaeologicalSitesController extends Controller
     {
         try {
             // Get locale from request header or default to app locale
-            $locale = $request->header('Accept-Language', app()->getLocale());
+            $locale = app()->getLocale();
             app()->setLocale($locale);
 
             // Validasyon kuralları
@@ -83,7 +83,7 @@ class NearbyArchaeologicalSitesController extends Controller
     {
         try {
             // Get locale from request header or default to app locale
-            $locale = $request->header('Accept-Language', app()->getLocale());
+            $locale = app()->getLocale();
             app()->setLocale($locale);
 
             $validated = $request->validate([

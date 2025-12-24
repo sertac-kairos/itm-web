@@ -15,10 +15,9 @@ class RegionController extends Controller
     public function index(Request $request): JsonResponse
     {
         // Get locale from request header or default to app locale
-        $locale = $request->header('Accept-Language', app()->getLocale());
+        $locale = app()->getLocale();
         
         // Set application locale for this request
-        app()->setLocale($locale);
 
         $regions = Region::active()
             ->ordered()
@@ -33,12 +32,14 @@ class RegionController extends Controller
         return response()->json([
             'success' => true,
             'locale' => $locale,
-            'data' => $regions->map(function ($region) {
+            'data' => $regions->map(function ($region) use ($locale) {
+                $translation = $region->translate($locale);
+                
                 return [
                     'id' => $region->id,
-                    'name' => $region->name, // Auto-translated by Astrotomic
-                    'subtitle' => $region->subtitle,
-                    'description' => $region->description,
+                    'name' => $translation?->name ?? '',
+                    'subtitle' => $translation?->subtitle ?? '',
+                    'description' => $translation?->description ?? '',
                     'color_code' => $region->color_code,
                     'main_image' => $region->main_image ? url('storage/' . $region->main_image) : null,
                     'hotspot_image' => $region->hotspot_image,
@@ -47,12 +48,14 @@ class RegionController extends Controller
                     'latitude' => $region->latitude,
                     'longitude' => $region->longitude,  
                     'sub_regions_count' => $region->subRegions->count(),
-                    'sub_regions' => $region->subRegions->map(function ($subRegion) {
+                    'sub_regions' => $region->subRegions->map(function ($subRegion) use ($locale) {
+                        $subTranslation = $subRegion->translate($locale);
+                        
                         return [
                             'id' => $subRegion->id,
-                            'name' => $subRegion->name,
-                            'subtitle' => $subRegion->subtitle,
-                            'description' => $subRegion->description,
+                            'name' => $subTranslation?->name ?? '',
+                            'subtitle' => $subTranslation?->subtitle ?? '',
+                            'description' => $subTranslation?->description ?? '',
                             'latitude' => $subRegion->latitude,
                             'longitude' => $subRegion->longitude,
                             'image' => $subRegion->image ? url('storage/' . $subRegion->image) : null,
@@ -70,8 +73,7 @@ class RegionController extends Controller
     public function show(Request $request, Region $region): JsonResponse
     {
         // Get locale from request header
-        $locale = $request->header('Accept-Language', app()->getLocale());
-        app()->setLocale($locale);
+        $locale = app()->getLocale();
 
         if (!$region->is_active) {
             return response()->json([
@@ -93,25 +95,29 @@ class RegionController extends Controller
             // Onboarding slides are now independent; remove eager loading from region
         ]);
 
+        $translation = $region->translate($locale);
+        
         return response()->json([
             'success' => true,
             'locale' => $locale,
             'data' => [
                 'id' => $region->id,
-                'name' => $region->name,
-                'subtitle' => $region->subtitle,
-                'description' => $region->description,
+                'name' => $translation?->name ?? '',
+                'subtitle' => $translation?->subtitle ?? '',
+                'description' => $translation?->description ?? '',
                 'color_code' => $region->color_code,
                 'main_image' => $region->main_image ? url('storage/' . $region->main_image) : null,
                 'hotspot_image' => $region->hotspot_image,
                 'audio_guide' => $region->audio_guide_path ? url('storage/' . $region->audio_guide_path) : null,
                 // Onboarding slides no longer tied to region
-                'sub_regions' => $region->subRegions->map(function ($subRegion) {
+                'sub_regions' => $region->subRegions->map(function ($subRegion) use ($locale) {
+                    $subTranslation = $subRegion->translate($locale);
+                    
                     return [
                         'id' => $subRegion->id,
-                        'name' => $subRegion->name,
-                        'subtitle' => $subRegion->subtitle,
-                        'description' => $subRegion->description,
+                        'name' => $subTranslation?->name ?? '',
+                        'subtitle' => $subTranslation?->subtitle ?? '',
+                        'description' => $subTranslation?->description ?? '',
                         'latitude' => $subRegion->latitude,
                         'longitude' => $subRegion->longitude,
                         'image' => $subRegion->image ? url('storage/' . $subRegion->image) : null,
@@ -133,8 +139,7 @@ class RegionController extends Controller
      */
     public function getByIds(Request $request): JsonResponse
     {
-        $locale = $request->header('Accept-Language', app()->getLocale());
-        app()->setLocale($locale);
+        $locale = app()->getLocale();
 
         // Validate that ids parameter is provided and is an array
         $request->validate([
@@ -161,12 +166,14 @@ class RegionController extends Controller
         return response()->json([
             'success' => true,
             'locale' => $locale,
-            'data' => $regions->map(function ($region) {
+            'data' => $regions->map(function ($region) use ($locale) {
+                $translation = $region->translate($locale);
+                
                 return [
                     'id' => $region->id,
-                    'name' => $region->name, // Auto-translated by Astrotomic
-                    'subtitle' => $region->subtitle,
-                    'description' => $region->description,
+                    'name' => $translation?->name ?? '',
+                    'subtitle' => $translation?->subtitle ?? '',
+                    'description' => $translation?->description ?? '',
                     'color_code' => $region->color_code,
                     'main_image' => $region->main_image ? url('storage/' . $region->main_image) : null,
                     'hotspot_image' => $region->hotspot_image,
@@ -175,12 +182,14 @@ class RegionController extends Controller
                     'latitude' => $region->latitude,
                     'longitude' => $region->longitude,  
                     'sub_regions_count' => $region->subRegions->count(),
-                    'sub_regions' => $region->subRegions->map(function ($subRegion) {
+                    'sub_regions' => $region->subRegions->map(function ($subRegion) use ($locale) {
+                        $subTranslation = $subRegion->translate($locale);
+                        
                         return [
                             'id' => $subRegion->id,
-                            'name' => $subRegion->name,
-                            'subtitle' => $subRegion->subtitle,
-                            'description' => $subRegion->description,
+                            'name' => $subTranslation?->name ?? '',
+                            'subtitle' => $subTranslation?->subtitle ?? '',
+                            'description' => $subTranslation?->description ?? '',
                             'latitude' => $subRegion->latitude,
                             'longitude' => $subRegion->longitude,
                             'image' => $subRegion->image ? url('storage/' . $subRegion->image) : null,

@@ -76,26 +76,32 @@ class NearbyArchaeologicalSitesService
     public function getFormattedNearbySites(float $latitude, float $longitude, int $limit = 10, float $maxDistanceKm = 50): array
     {
         $sites = $this->getNearbySites($latitude, $longitude, $limit, $maxDistanceKm);
+        $locale = app()->getLocale();
 
-        return $sites->map(function ($site) {
+        return $sites->map(function ($site) use ($locale) {
+            $siteTranslation = $site->translate($locale);
+            $subRegionTranslation = $site->subRegion?->translate($locale);
+            
             return [
                 'id' => $site->id,
                 'sub_region' => [
                     'id' => $site->subRegion?->id,
-                    'name' => $site->subRegion?->name,
+                    'name' => $subRegionTranslation?->name ?? '',
                 ],
-                'name' => $site->name,
-                'description' => $site->description,
+                'name' => $siteTranslation?->name ?? '',
+                'description' => $siteTranslation?->description ?? '',
                 'latitude' => $site->latitude,
                 'longitude' => $site->longitude,
                 'image' => $site->image ? url('storage/' . $site->image) : null,
                 'distance_km' => round($site->distance, 2),
                 'distance_m' => round($site->distance * 1000, 0),
-                'models_3d' => $site->models3d->map(function ($model) use ($site) {
+                'models_3d' => $site->models3d->map(function ($model) use ($site, $locale) {
+                    $modelTranslation = $model->translate($locale);
+                    
                     return [
                         'id' => $model->id,
-                        'name' => $model->name,
-                        'description' => $model->description,
+                        'name' => $modelTranslation?->name ?? '',
+                        'description' => $modelTranslation?->description ?? '',
                         'sketchfab_model_id' => $model->sketchfab_model_id,
                         'thumbnail' => $model->sketchfab_thumbnail_url,
                         'sort_order' => $model->sort_order,

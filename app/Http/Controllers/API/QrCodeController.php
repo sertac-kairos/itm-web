@@ -26,7 +26,7 @@ class QrCodeController extends Controller
      */
     public function scanByUuid(Request $request, string $uuid): JsonResponse
     {
-        $locale = $request->input('locale', $request->header('Accept-Language', 'tr'));
+        $locale = $request->input('locale', app()->getLocale());
 
         // Validate UUID format
         if (!$this->qrCodeScanService->isValidQrContent($uuid)) {

@@ -11,8 +11,7 @@ class OnboardingController extends Controller
 {
     public function index(Request $request): JsonResponse
     {
-        $locale = $request->header('Accept-Language', app()->getLocale());
-        app()->setLocale($locale);
+        $locale = app()->getLocale();
 
         $slides = OnboardingSlide::query()->active()->ordered()->with('translations')->get();
 
@@ -22,8 +21,8 @@ class OnboardingController extends Controller
             'data' => $slides->map(function (OnboardingSlide $slide) {
                 return [
                     'id' => $slide->id,
-                    'title' => $slide->title,
-                    'description' => $slide->description,
+                    'title' => $slide->title ?: '',
+                    'description' => $slide->description ?: '',
                     'image' => $slide->image ? url('storage/'.$slide->image) : null,
                     'sort_order' => $slide->sort_order,
                 ];

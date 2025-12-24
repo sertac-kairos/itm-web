@@ -28,24 +28,18 @@ class StoryController extends Controller
         // Get stories ordered by sort order
         $stories = $query->ordered()->get();
 
-        // Transform data for API response
-        $storiesData = $stories->map(function ($story) use ($request) {
-            $locale = $request->header('Accept-Language', config('translatable.fallback_locale'));
-            $translation = $story->translate($locale, false);
-            
-            // Prepare 3D model data if exists
+        $storiesData = $stories->map(function ($story) {
             $model3dData = null;
             if ($story->model3d) {
-                $model3dTranslation = $story->model3d->translate($locale, false);
                 $model3dData = [
                     'id' => $story->model3d->id,
-                    'name' => $model3dTranslation->name ?? null,
-                    'description' => $model3dTranslation->description ?? null,
+                    'name' => $story->model3d->name ?: '',
+                    'description' => $story->model3d->description ?: '',
                     'sketchfab_model_id' => $story->model3d->sketchfab_model_id,
                     'sketchfab_thumbnail_url' => $story->model3d->sketchfab_thumbnail_url,
                     'qr_uuid' => $story->model3d->qr_uuid,
                     'qr_image_path' => $story->model3d->qr_image_path ? asset('storage/' . $story->model3d->qr_image_path) : null,
-                    'locale' => $locale,
+                    'locale' => app()->getLocale(),
                     'available_translations' => $story->model3d->translations->pluck('locale')->toArray(),
                 ];
             }
@@ -57,10 +51,10 @@ class StoryController extends Controller
                 'is_active' => $story->is_active,
                 'created_at' => $story->created_at->toISOString(),
                 'updated_at' => $story->updated_at->toISOString(),
-                'title' => $translation->title ?? null,
-                'description' => $translation->description ?? null,
-                'image' => $translation && $translation->image ? asset('storage/' . $translation->image) : null,
-                'locale' => $locale,
+                'title' => $story->title ?: '',
+                'description' => $story->description ?: '',
+                'image' => $story->image ? asset('storage/' . $story->image) : null,
+                'locale' => app()->getLocale(),
                 'available_translations' => $story->translations->pluck('locale')->toArray(),
                 'model_3d' => $model3dData,
             ];
@@ -71,7 +65,7 @@ class StoryController extends Controller
             'data' => $storiesData,
             'meta' => [
                 'total' => $storiesData->count(),
-                'locale' => $request->header('Accept-Language', config('translatable.fallback_locale')),
+                'locale' => app()->getLocale(),
             ]
         ]);
     }
@@ -90,22 +84,17 @@ class StoryController extends Controller
 
         $story->load(['translations', 'model3d.translations']);
         
-        $locale = $request->header('Accept-Language', config('translatable.fallback_locale'));
-        $translation = $story->translate($locale, false);
-
-        // Prepare 3D model data if exists
         $model3dData = null;
         if ($story->model3d) {
-            $model3dTranslation = $story->model3d->translate($locale, false);
             $model3dData = [
                 'id' => $story->model3d->id,
-                'name' => $model3dTranslation->name ?? null,
-                'description' => $model3dTranslation->description ?? null,
+                'name' => $story->model3d->name ?: '',
+                'description' => $story->model3d->description ?: '',
                 'sketchfab_model_id' => $story->model3d->sketchfab_model_id,
                 'sketchfab_thumbnail_url' => $story->model3d->sketchfab_thumbnail_url,
                 'qr_uuid' => $story->model3d->qr_uuid,
                 'qr_image_path' => $story->model3d->qr_image_path ? asset('storage/' . $story->model3d->qr_image_path) : null,
-                'locale' => $locale,
+                'locale' => app()->getLocale(),
                 'available_translations' => $story->model3d->translations->pluck('locale')->toArray(),
             ];
         }
@@ -117,20 +106,20 @@ class StoryController extends Controller
             'is_active' => $story->is_active,
             'created_at' => $story->created_at->toISOString(),
             'updated_at' => $story->updated_at->toISOString(),
-            'title' => $translation->title ?? null,
-            'description' => $translation->description ?? null,
-            'image' => $translation && $translation->image ? asset('storage/' . $translation->image) : null,
-            'locale' => $locale,
+            'title' => $story->title ?: '',
+            'description' => $story->description ?: '',
+            'image' => $story->image ? asset('storage/' . $story->image) : null,
+            'locale' => app()->getLocale(),
             'available_translations' => $story->translations->pluck('locale')->toArray(),
             'model_3d' => $model3dData,
         ];
 
-        return response()->json([
-            'success' => true,
-            'data' => $storyData,
-            'meta' => [
-                'locale' => $locale,
-            ]
-        ]);
+            return response()->json([
+                'success' => true,
+                'data' => $storyData,
+                'meta' => [
+                    'locale' => app()->getLocale(),
+                ]
+            ]);
     }
 }

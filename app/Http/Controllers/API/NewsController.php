@@ -18,8 +18,7 @@ class NewsController extends Controller
     public function index(Request $request): JsonResponse
     {
         try {
-            $locale = $request->header('Accept-Language', 'tr');
-            app()->setLocale($locale);
+            $locale = app()->getLocale();
 
             $query = News::with(['images', 'translations'])
                 ->active()
@@ -34,12 +33,14 @@ class NewsController extends Controller
             return response()->json([
                 'success' => true,
                 'locale' => $locale,
-                'data' => $news->map(function (News $newsItem) {
+                'data' => $news->map(function (News $newsItem) use ($locale) {
+                    $translation = $newsItem->translate($locale);
+                    
                     return [
                         'id' => $newsItem->id,
                         'slug' => $newsItem->slug,
-                        'title' => $newsItem->title,
-                        'content' => $newsItem->content,
+                        'title' => $translation?->title ?? '',
+                        'content' => $translation?->content ?? '',
                         'news_date' => $newsItem->news_date?->format('Y-m-d'),
                         'featured_image' => $newsItem->featured_image ? url('storage/' . $newsItem->featured_image) : null,
                         'main_image' => $newsItem->main_image ? url('storage/' . $newsItem->main_image) : null,
@@ -86,8 +87,7 @@ class NewsController extends Controller
     public function show(Request $request, News $news): JsonResponse
     {
         try {
-            $locale = $request->header('Accept-Language', 'tr');
-            app()->setLocale($locale);
+            $locale = app()->getLocale();
 
             if (!$news->is_active) {
                 return response()->json([
@@ -104,8 +104,8 @@ class NewsController extends Controller
                 'data' => [
                     'id' => $news->id,
                     'slug' => $news->slug,
-                    'title' => $news->title,
-                    'content' => $news->content,
+                    'title' => $news->title ?: '',
+                    'content' => $news->content ?: '',
                     'news_date' => $news->news_date?->format('Y-m-d'),
                     'featured_image' => $news->featured_image ? url('storage/' . $news->featured_image) : null,
                     'main_image' => $news->main_image ? url('storage/' . $news->main_image) : null,
@@ -147,8 +147,7 @@ class NewsController extends Controller
                 'ids.*' => 'integer|min:1'
             ]);
 
-            $locale = $request->header('Accept-Language', 'tr');
-            app()->setLocale($locale);
+            $locale = app()->getLocale();
 
             $news = News::with(['images', 'translations'])
                 ->whereIn('id', $validated['ids'])
@@ -163,8 +162,8 @@ class NewsController extends Controller
                     return [
                         'id' => $newsItem->id,
                         'slug' => $newsItem->slug,
-                        'title' => $newsItem->title,
-                        'content' => $newsItem->content,
+                        'title' => $newsItem->title ?: '',
+                        'content' => $newsItem->content ?: '',
                         'news_date' => $newsItem->news_date?->format('Y-m-d'),
                         'featured_image' => $newsItem->featured_image ? url('storage/' . $newsItem->featured_image) : null,
                         'main_image' => $newsItem->main_image ? url('storage/' . $newsItem->main_image) : null,

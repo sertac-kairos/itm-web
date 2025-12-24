@@ -21,8 +21,7 @@ class SearchController extends Controller
      */
     public function search(Request $request): JsonResponse
     {
-        $locale = $request->header('Accept-Language', config('translatable.fallback_locale'));
-        app()->setLocale($locale);
+        $locale = app()->getLocale();
 
         $request->validate([
             'q' => 'required|string|min:1|max:255'
@@ -60,7 +59,7 @@ class SearchController extends Controller
             ->with(['translations'])
             ->get()
             ->map(function ($region) use ($locale) {
-                $translation = $region->translate($locale, false);
+                $translation = $region->translate($locale);
                 return [
                     'type' => 'region',
                     'id' => $region->id,
@@ -89,8 +88,8 @@ class SearchController extends Controller
             ->with(['translations', 'region.translations'])
             ->get()
             ->map(function ($subRegion) use ($locale) {
-                $translation = $subRegion->translate($locale, false);
-                $regionTranslation = $subRegion->region?->translate($locale, false);
+                $translation = $subRegion->translate($locale);
+                $regionTranslation = $subRegion->region?->translate($locale);
                 
                 return [
                     'type' => 'sub_region',
@@ -124,9 +123,9 @@ class SearchController extends Controller
             ->with(['translations', 'subRegion.translations', 'subRegion.region.translations'])
             ->get()
             ->map(function ($site) use ($locale) {
-                $translation = $site->translate($locale, false);
-                $subRegionTranslation = $site->subRegion?->translate($locale, false);
-                $regionTranslation = $site->subRegion?->region?->translate($locale, false);
+                $translation = $site->translate($locale);
+                $subRegionTranslation = $site->subRegion?->translate($locale);
+                $regionTranslation = $site->subRegion?->region?->translate($locale);
                 
                 return [
                     'type' => 'archaeological_site',
@@ -163,7 +162,7 @@ class SearchController extends Controller
             ->with(['translations', 'images'])
             ->get()
             ->map(function ($article) use ($locale) {
-                $translation = $article->translate($locale, false);
+                $translation = $article->translate($locale);
                 
                 return [
                     'type' => 'article',
@@ -198,7 +197,7 @@ class SearchController extends Controller
             ->with(['translations'])
             ->get()
             ->map(function ($memory) use ($locale) {
-                $translation = $memory->translate($locale, false);
+                $translation = $memory->translate($locale);
                 
                 return [
                     'type' => 'memory',

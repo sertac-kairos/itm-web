@@ -75,6 +75,9 @@ class QrCodeScanService
 
             
             // Prepare response data - return as array with single element
+            $siteTranslation = $archaeologicalSite->translate($locale);
+            $subRegionTranslation = $archaeologicalSite->subRegion?->translate($locale);
+            
             return response()->json([
                 'success' => true,
                 'locale' => $locale,
@@ -83,18 +86,20 @@ class QrCodeScanService
                         'id' => $archaeologicalSite->id,
                         'sub_region' => [
                             'id' => $archaeologicalSite->subRegion?->id,
-                            'name' => $archaeologicalSite->subRegion?->name,
+                            'name' => $subRegionTranslation?->name ?? '',
                         ],
-                        'name' => $archaeologicalSite->name,
-                        'description' => $archaeologicalSite->description,
+                        'name' => $siteTranslation?->name ?? '',
+                        'description' => $siteTranslation?->description ?? '',
                         'latitude' => $archaeologicalSite->latitude,
                         'longitude' => $archaeologicalSite->longitude,
                         'image' => $archaeologicalSite->image ? url('storage/' . $archaeologicalSite->image) : null,
-                        'models_3d' => $archaeologicalSite->models3d->map(function ($model) use ($archaeologicalSite) {
+                        'models_3d' => $archaeologicalSite->models3d->map(function ($model) use ($archaeologicalSite, $locale) {
+                            $modelTranslation = $model->translate($locale);
+                            
                             return [
                                 'id' => $model->id,
-                                'name' => $model->name,
-                                'description' => $model->description,
+                                'name' => $modelTranslation?->name ?? '',
+                                'description' => $modelTranslation?->description ?? '',
                                 'sketchfab_model_id' => $model->sketchfab_model_id,
                                 'thumbnail' => $model->sketchfab_thumbnail_url,
                                 'sort_order' => $model->sort_order,
