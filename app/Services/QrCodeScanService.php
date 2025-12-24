@@ -89,6 +89,7 @@ class QrCodeScanService
                             'name' => $subRegionTranslation?->name ?? '',
                         ],
                         'name' => $siteTranslation?->name ?? '',
+                        'model_key' => ($archaeologicalSite->getTranslation('tr', false)?->name ?? ''),
                         'description' => $siteTranslation?->description ?? '',
                         'latitude' => $archaeologicalSite->latitude,
                         'longitude' => $archaeologicalSite->longitude,

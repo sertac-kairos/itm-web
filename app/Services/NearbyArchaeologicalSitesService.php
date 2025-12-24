@@ -89,6 +89,7 @@ class NearbyArchaeologicalSitesService
                     'name' => $subRegionTranslation?->name ?? '',
                 ],
                 'name' => $siteTranslation?->name ?? '',
+                'model_key' => ($site->getTranslation('tr', false)?->name ?? ''),
                 'description' => $siteTranslation?->description ?? '',
                 'latitude' => $site->latitude,
                 'longitude' => $site->longitude,

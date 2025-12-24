@@ -52,6 +52,7 @@ class SubRegionController extends Controller
                         return [
                             'id' => $site->id,
                             'name' => $siteTranslation?->name ?? '',
+                            'model_key' => ($site->getTranslation('tr', false)?->name ?? ''),
                             'description' => $siteTranslation?->description ?? '',
                             'latitude' => $site->latitude,
                             'longitude' => $site->longitude,
@@ -124,6 +125,7 @@ class SubRegionController extends Controller
                     return [
                         'id' => $site->id,
                         'name' => $siteTranslation?->name ?? '',
+                        'model_key' => ($site->getTranslation('tr', false)?->name ?? ''),
                         'description' => $siteTranslation?->description ?? '',
                         'latitude' => $site->latitude,
                         'longitude' => $site->longitude,
@@ -208,6 +210,7 @@ class SubRegionController extends Controller
                         return [
                             'id' => $site->id,
                             'name' => $siteTranslation?->name ?? '',
+                            'model_key' => ($site->getTranslation('tr', false)?->name ?? ''),
                             'description' => $siteTranslation?->description ?? '',
                             'latitude' => $site->latitude,
                             'longitude' => $site->longitude,

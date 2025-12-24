@@ -35,6 +35,7 @@ class Model3dController extends Controller
                     'archaeological_site' => [
                         'id' => $model->archaeologicalSite?->id,
                         'name' => $siteTranslation?->name ?? '',
+                        'model_key' => ($model->archaeologicalSite?->getTranslation('tr', false)?->name ?? ''),
                     ],
                     'name' => $modelTranslation?->name ?? '',
                     'description' => $modelTranslation?->description ?? '',
@@ -70,6 +71,7 @@ class Model3dController extends Controller
                 'archaeological_site' => [
                     'id' => $model3d->archaeologicalSite?->id,
                     'name' => $siteTranslation?->name ?? '',
+                    'model_key' => ($model3d->archaeologicalSite?->getTranslation('tr', false)?->name ?? ''),
                 ],
                 'name' => $modelTranslation?->name ?? '',
                 'description' => $modelTranslation?->description ?? '',
@@ -153,6 +155,7 @@ class Model3dController extends Controller
                     'archaeological_site' => [
                         'id' => $model->archaeologicalSite?->id,
                         'name' => $siteTranslation?->name ?? '',
+                        'model_key' => ($model->archaeologicalSite?->getTranslation('tr', false)?->name ?? ''),
                         'description' => $siteTranslation?->description ?? '',
                         'latitude' => $model->archaeologicalSite?->latitude,
                         'longitude' => $model->archaeologicalSite?->longitude,
