@@ -24,17 +24,38 @@ class SearchController extends Controller
         $locale = $request->header('Accept-Language', config('translatable.fallback_locale'));
         app()->setLocale($locale);
 
-        // Validate search query
         $request->validate([
-            'q' => 'required|string|min:2|max:255'
+            'q' => 'required|string|min:1|max:255'
         ]);
 
         $searchTerm = $request->input('q');
+        $searchTerm = urldecode($searchTerm);
+        $searchTerm = trim($searchTerm);
+        $searchTerm = preg_replace('/\s+/', ' ', $searchTerm); 
+        
+        if (strlen($searchTerm) < 2) {
+            return response()->json([
+                'success' => true,
+                'locale' => $locale,
+                'query' => $searchTerm,
+                'counts' => [
+                    'regions' => 0,
+                    'sub_regions' => 0,
+                    'archaeological_sites' => 0,
+                    'articles' => 0,
+                    'memories' => 0,
+                    'total' => 0,
+                ],
+                'data' => [],
+            ]);
+        }
 
         // Search in regions
         $regions = Region::active()
             ->whereHas('translations', function ($query) use ($searchTerm) {
-                $query->where('name', 'like', "%{$searchTerm}%");
+                $query->where('name', 'like', "%{$searchTerm}%")
+                      ->orWhere('subtitle', 'like', "%{$searchTerm}%")
+                      ->orWhere('description', 'like', "%{$searchTerm}%");
             })
             ->with(['translations'])
             ->get()
@@ -61,7 +82,9 @@ class SearchController extends Controller
         // Search in sub-regions
         $subRegions = SubRegion::active()
             ->whereHas('translations', function ($query) use ($searchTerm) {
-                $query->where('name', 'like', "%{$searchTerm}%");
+                $query->where('name', 'like', "%{$searchTerm}%")
+                      ->orWhere('subtitle', 'like', "%{$searchTerm}%")
+                      ->orWhere('description', 'like', "%{$searchTerm}%");
             })
             ->with(['translations', 'region.translations'])
             ->get()
@@ -95,7 +118,8 @@ class SearchController extends Controller
         // Search in archaeological sites
         $archaeologicalSites = ArchaeologicalSite::active()
             ->whereHas('translations', function ($query) use ($searchTerm) {
-                $query->where('name', 'like', "%{$searchTerm}%");
+                $query->where('name', 'like', "%{$searchTerm}%")
+                      ->orWhere('description', 'like', "%{$searchTerm}%");
             })
             ->with(['translations', 'subRegion.translations', 'subRegion.region.translations'])
             ->get()
@@ -133,7 +157,8 @@ class SearchController extends Controller
         // Search in articles
         $articles = Article::active()
             ->whereHas('translations', function ($query) use ($searchTerm) {
-                $query->where('title', 'like', "%{$searchTerm}%");
+                $query->where('title', 'like', "%{$searchTerm}%")
+                      ->orWhere('content', 'like', "%{$searchTerm}%");
             })
             ->with(['translations', 'images'])
             ->get()
@@ -167,7 +192,8 @@ class SearchController extends Controller
         // Search in memories
         $memories = Memory::active()
             ->whereHas('translations', function ($query) use ($searchTerm) {
-                $query->where('title', 'like', "%{$searchTerm}%");
+                $query->where('title', 'like', "%{$searchTerm}%")
+                      ->orWhere('content', 'like', "%{$searchTerm}%");
             })
             ->with(['translations'])
             ->get()
