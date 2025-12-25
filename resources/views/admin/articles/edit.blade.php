@@ -70,7 +70,7 @@
                                                 <label for="title_{{ $locale }}" class="form-label">
                                                     Başlık {{ $locale === config('translatable.fallback_locale') ? '*' : '' }}
                                                     @if($locale === 'tr' && $loop->count > 1)
-                                                        <button type="button" class="btn btn-sm btn-outline-primary ms-2" onclick="translateFromTurkish()">
+                                                        <button type="button" class="btn btn-sm btn-outline-primary ms-2" onclick="translateFromTurkish(event)">
                                                             <i class="mdi mdi-translate me-1"></i>İngilizceye Çevir
                                                         </button>
                                                     @endif
@@ -89,7 +89,7 @@
                                                 <label for="content_{{ $locale }}" class="form-label">
                                                     İçerik {{ $locale === config('translatable.fallback_locale') ? '*' : '' }}
                                                     @if($locale === 'tr' && $loop->count > 1)
-                                                        <button type="button" class="btn btn-sm btn-outline-primary ms-2" onclick="translateContentFromTurkish()">
+                                                        <button type="button" class="btn btn-sm btn-outline-primary ms-2" onclick="translateContentFromTurkish(event)">
                                                             <i class="mdi mdi-translate me-1"></i>İngilizceye Çevir
                                                         </button>
                                                     @endif
@@ -178,15 +178,11 @@
                                             <small class="text-muted">Sıra: {{ $image->sort_order }}</small>
                                         </div>
                                         <div>
-                                            <form action="{{ route('admin.articles.delete-image', [$article, $image]) }}" 
-                                                  method="POST" class="d-inline" 
-                                                  onsubmit="return confirm('Bu resmi silmek istediğinizden emin misiniz?')">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" class="btn btn-sm btn-outline-danger" title="Resmi Sil">
-                                                    <i class="mdi mdi-delete"></i>
-                                                </button>
-                                            </form>
+                                            <button type="button" class="btn btn-sm btn-outline-danger" 
+                                                    title="Resmi Sil"
+                                                    onclick="deleteImage({{ $article->id }}, {{ $image->id }})">
+                                                <i class="mdi mdi-delete"></i>
+                                            </button>
                                         </div>
                                     </div>
                                 </div>
@@ -246,6 +242,38 @@
 
 @section('scripts')
 <script>
+    // Delete image function
+    function deleteImage(articleId, imageId) {
+        if (!confirm('Bu resmi silmek istediğinizden emin misiniz?')) {
+            return;
+        }
+
+        const csrfToken = document.querySelector('meta[name="csrf-token"]');
+        if (!csrfToken) {
+            alert('CSRF token bulunamadı. Sayfayı yenileyin.');
+            return;
+        }
+
+        // Create a temporary form for DELETE request
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = `/admin/articles/${articleId}/images/${imageId}`;
+        
+        const csrfInput = document.createElement('input');
+        csrfInput.type = 'hidden';
+        csrfInput.name = '_token';
+        csrfInput.value = csrfToken.getAttribute('content');
+        form.appendChild(csrfInput);
+        
+        const methodInput = document.createElement('input');
+        methodInput.type = 'hidden';
+        methodInput.name = '_method';
+        methodInput.value = 'DELETE';
+        form.appendChild(methodInput);
+        
+        document.body.appendChild(form);
+        form.submit();
+    }
 
     // Image preview functionality
     document.getElementById('images').addEventListener('change', function(e) {
@@ -285,7 +313,7 @@
     });
 
     // Translation functions
-    function translateFromTurkish() {
+    function translateFromTurkish(event) {
         const turkishTitle = document.getElementById('title_tr');
         if (!turkishTitle || !turkishTitle.value.trim()) {
             alert('Lütfen önce Türkçe başlık girin.');
@@ -343,7 +371,7 @@
         });
     }
 
-    function translateContentFromTurkish() {
+    function translateContentFromTurkish(event) {
         const turkishContent = document.getElementById('content_tr');
         if (!turkishContent || !turkishContent.value.trim()) {
             alert('Lütfen önce Türkçe içerik girin.');

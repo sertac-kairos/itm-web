@@ -178,15 +178,11 @@
                                             <small class="text-muted">Sıra: {{ $image->sort_order }}</small>
                                         </div>
                                         <div>
-                                            <form action="{{ route('admin.news.delete-image', [$news, $image]) }}" 
-                                                  method="POST" class="d-inline" 
-                                                  onsubmit="return confirm('Bu resmi silmek istediğinizden emin misiniz?')">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" class="btn btn-sm btn-outline-danger" title="Resmi Sil">
-                                                    <i class="mdi mdi-delete"></i>
-                                                </button>
-                                            </form>
+                                            <button type="button" class="btn btn-sm btn-outline-danger" 
+                                                    title="Resmi Sil"
+                                                    onclick="deleteImage({{ $news->id }}, {{ $image->id }})">
+                                                <i class="mdi mdi-delete"></i>
+                                            </button>
                                         </div>
                                     </div>
                                 </div>
@@ -246,6 +242,39 @@
 
 @section('scripts')
 <script>
+    // Delete image function
+    function deleteImage(newsId, imageId) {
+        if (!confirm('Bu resmi silmek istediğinizden emin misiniz?')) {
+            return;
+        }
+
+        const csrfToken = document.querySelector('meta[name="csrf-token"]');
+        if (!csrfToken) {
+            alert('CSRF token bulunamadı. Sayfayı yenileyin.');
+            return;
+        }
+
+        // Create a temporary form for DELETE request
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = `/admin/news/${newsId}/images/${imageId}`;
+        
+        const csrfInput = document.createElement('input');
+        csrfInput.type = 'hidden';
+        csrfInput.name = '_token';
+        csrfInput.value = csrfToken.getAttribute('content');
+        form.appendChild(csrfInput);
+        
+        const methodInput = document.createElement('input');
+        methodInput.type = 'hidden';
+        methodInput.name = '_method';
+        methodInput.value = 'DELETE';
+        form.appendChild(methodInput);
+        
+        document.body.appendChild(form);
+        form.submit();
+    }
+
     // Make locales available globally for the Quill component
     window.articleLocales = @json($locales);
     console.log('Locales set:', window.articleLocales);
