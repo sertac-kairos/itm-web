@@ -49,7 +49,26 @@ class NewsController extends Controller
             $query->where('news_date', '<=', $request->date_to);
         }
 
-        $news = $query->ordered()->paginate(15)->withQueryString();
+        // Sorting
+        $sortField = $request->get('sort', 'sort_order');
+        $sortDirection = $request->get('direction', 'asc');
+        
+        if ($sortField === 'title') {
+            // Sort by translated title
+            $locale = app()->getLocale();
+            $query->leftJoin('news_translations', function($join) use ($locale) {
+                $join->on('news.id', '=', 'news_translations.news_id')
+                     ->where('news_translations.locale', '=', $locale);
+            })
+            ->orderBy('news_translations.title', $sortDirection)
+            ->select('news.*');
+        } elseif (in_array($sortField, ['id', 'sort_order', 'is_active', 'created_at', 'updated_at', 'news_date'])) {
+            $query->orderBy($sortField, $sortDirection);
+        } else {
+            $query->ordered();
+        }
+
+        $news = $query->paginate(15)->withQueryString();
 
         return view('admin.news.index', compact('news'));
     }
@@ -300,6 +319,56 @@ class NewsController extends Controller
                 $translation->content = $request->input("{$locale}.content");
             }
         }
+    }
+
+    /**
+     * Move news up in sort order
+     */
+    public function moveUp(News $news): RedirectResponse
+    {
+        // Find the previous item (lower sort_order)
+        $previous = News::where('sort_order', '<', $news->sort_order)
+            ->orderBy('sort_order', 'desc')
+            ->first();
+        
+        if ($previous) {
+            // Swap sort orders
+            $tempOrder = $news->sort_order;
+            $news->sort_order = $previous->sort_order;
+            $previous->sort_order = $tempOrder;
+            
+            $news->save();
+            $previous->save();
+            
+            return redirect()->back()->with('success', 'Sıralama güncellendi.');
+        }
+        
+        return redirect()->back()->with('error', 'Haber zaten en üstte.');
+    }
+
+    /**
+     * Move news down in sort order
+     */
+    public function moveDown(News $news): RedirectResponse
+    {
+        // Find the next item (higher sort_order)
+        $next = News::where('sort_order', '>', $news->sort_order)
+            ->orderBy('sort_order', 'asc')
+            ->first();
+        
+        if ($next) {
+            // Swap sort orders
+            $tempOrder = $news->sort_order;
+            $news->sort_order = $next->sort_order;
+            $next->sort_order = $tempOrder;
+            
+            $news->save();
+            $next->save();
+            
+            return redirect()->back()->with('success', 'Sıralama güncellendi.');
+        }
+        
+        return redirect()->back()->with('error', 'Haber zaten en altta.');
     }
 
     /**

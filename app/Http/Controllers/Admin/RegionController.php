@@ -23,10 +23,28 @@ class RegionController extends Controller
      */
     public function index(Request $request): View
     {
-        $regions = Region::with('translations')
-            ->ordered()
-            ->paginate(15)
-            ->withQueryString();
+        $query = Region::with('translations');
+
+        // Sorting
+        $sortField = $request->get('sort', 'sort_order');
+        $sortDirection = $request->get('direction', 'asc');
+        
+        if ($sortField === 'name') {
+            // Sort by translated name
+            $locale = app()->getLocale();
+            $query->leftJoin('region_translations', function($join) use ($locale) {
+                $join->on('regions.id', '=', 'region_translations.region_id')
+                     ->where('region_translations.locale', '=', $locale);
+            })
+            ->orderBy('region_translations.name', $sortDirection)
+            ->select('regions.*');
+        } elseif (in_array($sortField, ['id', 'sort_order', 'is_active', 'created_at', 'updated_at', 'latitude', 'longitude', 'color_code'])) {
+            $query->orderBy($sortField, $sortDirection);
+        } else {
+            $query->ordered();
+        }
+
+        $regions = $query->paginate(15)->withQueryString();
 
         return view('admin.regions.index', compact('regions'));
     }
@@ -241,6 +259,56 @@ class RegionController extends Controller
         return redirect()
             ->route('admin.regions.index')
             ->with('success', 'Bölge başarıyla silindi.');
+    }
+
+    /**
+     * Move region up in sort order
+     */
+    public function moveUp(Region $region): RedirectResponse
+    {
+        // Find the previous item (lower sort_order)
+        $previous = Region::where('sort_order', '<', $region->sort_order)
+            ->orderBy('sort_order', 'desc')
+            ->first();
+        
+        if ($previous) {
+            // Swap sort orders
+            $tempOrder = $region->sort_order;
+            $region->sort_order = $previous->sort_order;
+            $previous->sort_order = $tempOrder;
+            
+            $region->save();
+            $previous->save();
+            
+            return redirect()->back()->with('success', 'Sıralama güncellendi.');
+        }
+        
+        return redirect()->back()->with('error', 'Bölge zaten en üstte.');
+    }
+
+    /**
+     * Move region down in sort order
+     */
+    public function moveDown(Region $region): RedirectResponse
+    {
+        // Find the next item (higher sort_order)
+        $next = Region::where('sort_order', '>', $region->sort_order)
+            ->orderBy('sort_order', 'asc')
+            ->first();
+        
+        if ($next) {
+            // Swap sort orders
+            $tempOrder = $region->sort_order;
+            $region->sort_order = $next->sort_order;
+            $next->sort_order = $tempOrder;
+            
+            $region->save();
+            $next->save();
+            
+            return redirect()->back()->with('success', 'Sıralama güncellendi.');
+        }
+        
+        return redirect()->back()->with('error', 'Bölge zaten en altta.');
     }
 
     /**

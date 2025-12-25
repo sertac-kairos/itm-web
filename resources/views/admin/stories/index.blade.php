@@ -105,10 +105,46 @@
                                             <label class="form-check-label" for="customCheck1">&nbsp;</label>
                                         </div>
                                     </th>
-                                    <th>Hikaye</th>
-                                    <th>Sıra</th>
-                                    <th>Durum</th>
-                                    <th>Oluşturulma</th>
+                                    <th>
+                                        <a href="{{ route('admin.stories.index', array_merge(request()->except(['sort', 'direction']), ['sort' => 'title', 'direction' => request('direction') === 'asc' ? 'desc' : 'asc'])) }}" class="text-dark text-decoration-none">
+                                            Hikaye
+                                            @if(request('sort') === 'title' || request('sort') === 'id')
+                                                <i class="mdi mdi-chevron-{{ request('direction') === 'desc' ? 'down' : 'up' }}"></i>
+                                            @else
+                                                <i class="mdi mdi-chevron-up opacity-25"></i>
+                                            @endif
+                                        </a>
+                                    </th>
+                                    <th>
+                                        <a href="{{ route('admin.stories.index', array_merge(request()->except(['sort', 'direction']), ['sort' => 'sort_order', 'direction' => request('direction') === 'asc' ? 'desc' : 'asc'])) }}" class="text-dark text-decoration-none">
+                                            Sıra
+                                            @if(request('sort') === 'sort_order' || !request('sort'))
+                                                <i class="mdi mdi-chevron-{{ request('direction') === 'desc' ? 'down' : 'up' }}"></i>
+                                            @else
+                                                <i class="mdi mdi-chevron-up opacity-25"></i>
+                                            @endif
+                                        </a>
+                                    </th>
+                                    <th>
+                                        <a href="{{ route('admin.stories.index', array_merge(request()->except(['sort', 'direction']), ['sort' => 'is_active', 'direction' => request('direction') === 'asc' ? 'desc' : 'asc'])) }}" class="text-dark text-decoration-none">
+                                            Durum
+                                            @if(request('sort') === 'is_active')
+                                                <i class="mdi mdi-chevron-{{ request('direction') === 'desc' ? 'down' : 'up' }}"></i>
+                                            @else
+                                                <i class="mdi mdi-chevron-up opacity-25"></i>
+                                            @endif
+                                        </a>
+                                    </th>
+                                    <th>
+                                        <a href="{{ route('admin.stories.index', array_merge(request()->except(['sort', 'direction']), ['sort' => 'created_at', 'direction' => request('direction') === 'asc' ? 'desc' : 'asc'])) }}" class="text-dark text-decoration-none">
+                                            Oluşturulma
+                                            @if(request('sort') === 'created_at')
+                                                <i class="mdi mdi-chevron-{{ request('direction') === 'desc' ? 'down' : 'up' }}"></i>
+                                            @else
+                                                <i class="mdi mdi-chevron-up opacity-25"></i>
+                                            @endif
+                                        </a>
+                                    </th>
                                     <th style="width: 125px;">İşlemler</th>
                                 </tr>
                             </thead>

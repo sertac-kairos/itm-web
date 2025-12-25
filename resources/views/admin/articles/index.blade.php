@@ -108,14 +108,68 @@
                         <table class="table table-centered table-nowrap table-hover mb-0">
                             <thead class="table-light">
                                 <tr>
-                                    <th>ID</th>
+                                    <th>
+                                        <a href="{{ route('admin.articles.index', array_merge(request()->except(['sort', 'direction']), ['sort' => 'id', 'direction' => request('direction') === 'asc' ? 'desc' : 'asc'])) }}" class="text-dark text-decoration-none">
+                                            ID
+                                            @if(request('sort') === 'id')
+                                                <i class="mdi mdi-chevron-{{ request('direction') === 'desc' ? 'down' : 'up' }}"></i>
+                                            @else
+                                                <i class="mdi mdi-chevron-up opacity-25"></i>
+                                            @endif
+                                        </a>
+                                    </th>
                                     <th>Ana Resim</th>
-                                    <th>Başlık & İçerik</th>
-                                    <th>Yazar</th>
+                                    <th>
+                                        <a href="{{ route('admin.articles.index', array_merge(request()->except(['sort', 'direction']), ['sort' => 'title', 'direction' => request('direction') === 'asc' ? 'desc' : 'asc'])) }}" class="text-dark text-decoration-none">
+                                            Başlık & İçerik
+                                            @if(request('sort') === 'title')
+                                                <i class="mdi mdi-chevron-{{ request('direction') === 'desc' ? 'down' : 'up' }}"></i>
+                                            @else
+                                                <i class="mdi mdi-chevron-up opacity-25"></i>
+                                            @endif
+                                        </a>
+                                    </th>
+                                    <th>
+                                        <a href="{{ route('admin.articles.index', array_merge(request()->except(['sort', 'direction']), ['sort' => 'author', 'direction' => request('direction') === 'asc' ? 'desc' : 'asc'])) }}" class="text-dark text-decoration-none">
+                                            Yazar
+                                            @if(request('sort') === 'author')
+                                                <i class="mdi mdi-chevron-{{ request('direction') === 'desc' ? 'down' : 'up' }}"></i>
+                                            @else
+                                                <i class="mdi mdi-chevron-up opacity-25"></i>
+                                            @endif
+                                        </a>
+                                    </th>
                                     <th>Resim Sayısı</th>
-                                    <th>Durum</th>
-                                    <th>Sıra</th>
-                                    <th>Tarih</th>
+                                    <th>
+                                        <a href="{{ route('admin.articles.index', array_merge(request()->except(['sort', 'direction']), ['sort' => 'is_active', 'direction' => request('direction') === 'asc' ? 'desc' : 'asc'])) }}" class="text-dark text-decoration-none">
+                                            Durum
+                                            @if(request('sort') === 'is_active')
+                                                <i class="mdi mdi-chevron-{{ request('direction') === 'desc' ? 'down' : 'up' }}"></i>
+                                            @else
+                                                <i class="mdi mdi-chevron-up opacity-25"></i>
+                                            @endif
+                                        </a>
+                                    </th>
+                                    <th>
+                                        <a href="{{ route('admin.articles.index', array_merge(request()->except(['sort', 'direction']), ['sort' => 'sort_order', 'direction' => request('direction') === 'asc' ? 'desc' : 'asc'])) }}" class="text-dark text-decoration-none">
+                                            Sıra
+                                            @if(request('sort') === 'sort_order' || !request('sort'))
+                                                <i class="mdi mdi-chevron-{{ request('direction') === 'desc' ? 'down' : 'up' }}"></i>
+                                            @else
+                                                <i class="mdi mdi-chevron-up opacity-25"></i>
+                                            @endif
+                                        </a>
+                                    </th>
+                                    <th>
+                                        <a href="{{ route('admin.articles.index', array_merge(request()->except(['sort', 'direction']), ['sort' => 'created_at', 'direction' => request('direction') === 'asc' ? 'desc' : 'asc'])) }}" class="text-dark text-decoration-none">
+                                            Tarih
+                                            @if(request('sort') === 'created_at')
+                                                <i class="mdi mdi-chevron-{{ request('direction') === 'desc' ? 'down' : 'up' }}"></i>
+                                            @else
+                                                <i class="mdi mdi-chevron-up opacity-25"></i>
+                                            @endif
+                                        </a>
+                                    </th>
                                     <th>İşlemler</th>
                                 </tr>
                             </thead>

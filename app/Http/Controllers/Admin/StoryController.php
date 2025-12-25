@@ -39,7 +39,26 @@ class StoryController extends Controller
             });
         }
 
-        $stories = $query->ordered()->paginate(15)->withQueryString();
+        // Sorting
+        $sortField = $request->get('sort', 'sort_order');
+        $sortDirection = $request->get('direction', 'asc');
+        
+        if ($sortField === 'title') {
+            // Sort by translated title
+            $locale = app()->getLocale();
+            $query->leftJoin('story_translations', function($join) use ($locale) {
+                $join->on('stories.id', '=', 'story_translations.story_id')
+                     ->where('story_translations.locale', '=', $locale);
+            })
+            ->orderBy('story_translations.title', $sortDirection)
+            ->select('stories.*');
+        } elseif (in_array($sortField, ['id', 'model_3d_id', 'sort_order', 'is_active', 'created_at', 'updated_at'])) {
+            $query->orderBy($sortField, $sortDirection);
+        } else {
+            $query->ordered();
+        }
+
+        $stories = $query->paginate(15)->withQueryString();
 
         return view('admin.stories.index', compact('stories'));
     }
@@ -265,6 +284,56 @@ class StoryController extends Controller
         $filename = $directory . '/' . uniqid('canvas_') . '.png';
         Storage::disk('public')->put($filename, $binary);
         return $filename;
+    }
+
+    /**
+     * Move story up in sort order
+     */
+    public function moveUp(Story $story): RedirectResponse
+    {
+        // Find the previous item (lower sort_order)
+        $previous = Story::where('sort_order', '<', $story->sort_order)
+            ->orderBy('sort_order', 'desc')
+            ->first();
+        
+        if ($previous) {
+            // Swap sort orders
+            $tempOrder = $story->sort_order;
+            $story->sort_order = $previous->sort_order;
+            $previous->sort_order = $tempOrder;
+            
+            $story->save();
+            $previous->save();
+            
+            return redirect()->back()->with('success', 'Sıralama güncellendi.');
+        }
+        
+        return redirect()->back()->with('error', 'Hikaye zaten en üstte.');
+    }
+
+    /**
+     * Move story down in sort order
+     */
+    public function moveDown(Story $story): RedirectResponse
+    {
+        // Find the next item (higher sort_order)
+        $next = Story::where('sort_order', '>', $story->sort_order)
+            ->orderBy('sort_order', 'asc')
+            ->first();
+        
+        if ($next) {
+            // Swap sort orders
+            $tempOrder = $story->sort_order;
+            $story->sort_order = $next->sort_order;
+            $next->sort_order = $tempOrder;
+            
+            $story->save();
+            $next->save();
+            
+            return redirect()->back()->with('success', 'Sıralama güncellendi.');
+        }
+        
+        return redirect()->back()->with('error', 'Hikaye zaten en altta.');
     }
 
     /**

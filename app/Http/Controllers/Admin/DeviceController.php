@@ -55,7 +55,17 @@ class DeviceController extends Controller
             });
         }
 
-        $devices = $query->orderBy('last_seen', 'desc')->paginate(15)->withQueryString();
+        // Sorting
+        $sortField = $request->get('sort', 'last_seen');
+        $sortDirection = $request->get('direction', 'desc');
+        
+        if (in_array($sortField, ['id', 'device_id', 'gcm_id', 'platform', 'latitude', 'longitude', 'last_seen', 'created_at'])) {
+            $query->orderBy($sortField, $sortDirection);
+        } else {
+            $query->orderBy('last_seen', 'desc');
+        }
+
+        $devices = $query->paginate(15)->withQueryString();
 
         return view('admin.devices.index', compact('devices'));
     }

@@ -40,7 +40,26 @@ class SubRegionController extends Controller
             });
         }
 
-        $subRegions = $query->ordered()->paginate(15)->withQueryString();
+        // Sorting
+        $sortField = $request->get('sort', 'sort_order');
+        $sortDirection = $request->get('direction', 'asc');
+        
+        if ($sortField === 'name') {
+            // Sort by translated name
+            $locale = app()->getLocale();
+            $query->leftJoin('sub_region_translations', function($join) use ($locale) {
+                $join->on('sub_regions.id', '=', 'sub_region_translations.sub_region_id')
+                     ->where('sub_region_translations.locale', '=', $locale);
+            })
+            ->orderBy('sub_region_translations.name', $sortDirection)
+            ->select('sub_regions.*');
+        } elseif (in_array($sortField, ['id', 'region_id', 'sort_order', 'is_active', 'created_at', 'updated_at', 'latitude', 'longitude', 'color'])) {
+            $query->orderBy($sortField, $sortDirection);
+        } else {
+            $query->ordered();
+        }
+
+        $subRegions = $query->paginate(15)->withQueryString();
         $regions = Region::with('translations')->active()->ordered()->get();
 
         return view('admin.sub-regions.index', compact('subRegions', 'regions'));
@@ -269,6 +288,62 @@ class SubRegionController extends Controller
         return redirect()
             ->route('admin.sub-regions.index', ['region_id' => $regionId])
             ->with('success', 'Alt bölge başarıyla silindi.');
+    }
+
+    /**
+     * Move sub-region up in sort order
+     */
+    public function moveUp(SubRegion $subRegion): RedirectResponse
+    {
+        $regionId = $subRegion->region_id;
+        
+        // Find the previous item (lower sort_order)
+        $previous = SubRegion::where('region_id', $regionId)
+            ->where('sort_order', '<', $subRegion->sort_order)
+            ->orderBy('sort_order', 'desc')
+            ->first();
+        
+        if ($previous) {
+            // Swap sort orders
+            $tempOrder = $subRegion->sort_order;
+            $subRegion->sort_order = $previous->sort_order;
+            $previous->sort_order = $tempOrder;
+            
+            $subRegion->save();
+            $previous->save();
+            
+            return redirect()->back()->with('success', 'Sıralama güncellendi.');
+        }
+        
+        return redirect()->back()->with('error', 'Alt bölge zaten en üstte.');
+    }
+
+    /**
+     * Move sub-region down in sort order
+     */
+    public function moveDown(SubRegion $subRegion): RedirectResponse
+    {
+        $regionId = $subRegion->region_id;
+        
+        // Find the next item (higher sort_order)
+        $next = SubRegion::where('region_id', $regionId)
+            ->where('sort_order', '>', $subRegion->sort_order)
+            ->orderBy('sort_order', 'asc')
+            ->first();
+        
+        if ($next) {
+            // Swap sort orders
+            $tempOrder = $subRegion->sort_order;
+            $subRegion->sort_order = $next->sort_order;
+            $next->sort_order = $tempOrder;
+            
+            $subRegion->save();
+            $next->save();
+            
+            return redirect()->back()->with('success', 'Sıralama güncellendi.');
+        }
+        
+        return redirect()->back()->with('error', 'Alt bölge zaten en altta.');
     }
 
     /**

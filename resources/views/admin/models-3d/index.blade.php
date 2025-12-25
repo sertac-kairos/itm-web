@@ -77,11 +77,56 @@
                             <thead class="table-light">
                                 <tr>
                                     <th>Önizleme</th>
-                                    <th>Ad</th>
-                                    <th>Ören Yeri</th>
-                                    <th>Sıra</th>
-                                    <th>Durum</th>
-                                    <th>Oluşturulma</th>
+                                    <th>
+                                        <a href="{{ route('admin.models-3d.index', array_merge(request()->except(['sort', 'direction']), ['sort' => 'name', 'direction' => request('direction') === 'asc' ? 'desc' : 'asc'])) }}" class="text-dark text-decoration-none">
+                                            Ad
+                                            @if(request('sort') === 'name' || request('sort') === 'id')
+                                                <i class="mdi mdi-chevron-{{ request('direction') === 'desc' ? 'down' : 'up' }}"></i>
+                                            @else
+                                                <i class="mdi mdi-chevron-up opacity-25"></i>
+                                            @endif
+                                        </a>
+                                    </th>
+                                    <th>
+                                        <a href="{{ route('admin.models-3d.index', array_merge(request()->except(['sort', 'direction']), ['sort' => 'archaeological_site_id', 'direction' => request('direction') === 'asc' ? 'desc' : 'asc'])) }}" class="text-dark text-decoration-none">
+                                            Ören Yeri
+                                            @if(request('sort') === 'archaeological_site_id')
+                                                <i class="mdi mdi-chevron-{{ request('direction') === 'desc' ? 'down' : 'up' }}"></i>
+                                            @else
+                                                <i class="mdi mdi-chevron-up opacity-25"></i>
+                                            @endif
+                                        </a>
+                                    </th>
+                                    <th>
+                                        <a href="{{ route('admin.models-3d.index', array_merge(request()->except(['sort', 'direction']), ['sort' => 'sort_order', 'direction' => request('direction') === 'asc' ? 'desc' : 'asc'])) }}" class="text-dark text-decoration-none">
+                                            Sıra
+                                            @if(request('sort') === 'sort_order' || !request('sort'))
+                                                <i class="mdi mdi-chevron-{{ request('direction') === 'desc' ? 'down' : 'up' }}"></i>
+                                            @else
+                                                <i class="mdi mdi-chevron-up opacity-25"></i>
+                                            @endif
+                                        </a>
+                                    </th>
+                                    <th>
+                                        <a href="{{ route('admin.models-3d.index', array_merge(request()->except(['sort', 'direction']), ['sort' => 'is_active', 'direction' => request('direction') === 'asc' ? 'desc' : 'asc'])) }}" class="text-dark text-decoration-none">
+                                            Durum
+                                            @if(request('sort') === 'is_active')
+                                                <i class="mdi mdi-chevron-{{ request('direction') === 'desc' ? 'down' : 'up' }}"></i>
+                                            @else
+                                                <i class="mdi mdi-chevron-up opacity-25"></i>
+                                            @endif
+                                        </a>
+                                    </th>
+                                    <th>
+                                        <a href="{{ route('admin.models-3d.index', array_merge(request()->except(['sort', 'direction']), ['sort' => 'created_at', 'direction' => request('direction') === 'asc' ? 'desc' : 'asc'])) }}" class="text-dark text-decoration-none">
+                                            Oluşturulma
+                                            @if(request('sort') === 'created_at')
+                                                <i class="mdi mdi-chevron-{{ request('direction') === 'desc' ? 'down' : 'up' }}"></i>
+                                            @else
+                                                <i class="mdi mdi-chevron-up opacity-25"></i>
+                                            @endif
+                                        </a>
+                                    </th>
                                     <th>İşlemler</th>
                                 </tr>
                             </thead>

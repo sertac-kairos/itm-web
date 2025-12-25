@@ -47,7 +47,26 @@ class MemoryController extends Controller
             }
         }
 
-        $memories = $query->ordered()->paginate(15)->withQueryString();
+        // Sorting
+        $sortField = $request->get('sort', 'sort_order');
+        $sortDirection = $request->get('direction', 'asc');
+        
+        if ($sortField === 'title') {
+            // Sort by translated title
+            $locale = app()->getLocale();
+            $query->leftJoin('memory_translations', function($join) use ($locale) {
+                $join->on('memories.id', '=', 'memory_translations.memory_id')
+                     ->where('memory_translations.locale', '=', $locale);
+            })
+            ->orderBy('memory_translations.title', $sortDirection)
+            ->select('memories.*');
+        } elseif (in_array($sortField, ['id', 'author', 'link', 'image', 'sort_order', 'is_active', 'created_at', 'updated_at'])) {
+            $query->orderBy($sortField, $sortDirection);
+        } else {
+            $query->ordered();
+        }
+
+        $memories = $query->paginate(15)->withQueryString();
 
         return view('admin.memories.index', compact('memories'));
     }
@@ -218,6 +237,56 @@ class MemoryController extends Controller
         $memory->delete();
 
         return redirect()->route('admin.memories.index')->with('success', 'Hafıza İzmir kaydı başarıyla silindi.');
+    }
+
+    /**
+     * Move memory up in sort order
+     */
+    public function moveUp(Memory $memory): RedirectResponse
+    {
+        // Find the previous item (lower sort_order)
+        $previous = Memory::where('sort_order', '<', $memory->sort_order)
+            ->orderBy('sort_order', 'desc')
+            ->first();
+        
+        if ($previous) {
+            // Swap sort orders
+            $tempOrder = $memory->sort_order;
+            $memory->sort_order = $previous->sort_order;
+            $previous->sort_order = $tempOrder;
+            
+            $memory->save();
+            $previous->save();
+            
+            return redirect()->back()->with('success', 'Sıralama güncellendi.');
+        }
+        
+        return redirect()->back()->with('error', 'Anı zaten en üstte.');
+    }
+
+    /**
+     * Move memory down in sort order
+     */
+    public function moveDown(Memory $memory): RedirectResponse
+    {
+        // Find the next item (higher sort_order)
+        $next = Memory::where('sort_order', '>', $memory->sort_order)
+            ->orderBy('sort_order', 'asc')
+            ->first();
+        
+        if ($next) {
+            // Swap sort orders
+            $tempOrder = $memory->sort_order;
+            $memory->sort_order = $next->sort_order;
+            $next->sort_order = $tempOrder;
+            
+            $memory->save();
+            $next->save();
+            
+            return redirect()->back()->with('success', 'Sıralama güncellendi.');
+        }
+        
+        return redirect()->back()->with('error', 'Anı zaten en altta.');
     }
 
     /**

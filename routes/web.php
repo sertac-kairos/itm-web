@@ -27,10 +27,14 @@ Route::prefix('admin')->name('admin.')->group(function () {
     // Regions Management
     Route::resource('regions', AdminRegionController::class)->middleware(\App\Http\Middleware\RedirectIfNotAuthenticated::class);
     Route::post('regions/translate', [AdminRegionController::class, 'translate'])->middleware(\App\Http\Middleware\RedirectIfNotAuthenticated::class)->name('regions.translate');
+    Route::post('regions/{region}/move-up', [AdminRegionController::class, 'moveUp'])->middleware(\App\Http\Middleware\RedirectIfNotAuthenticated::class)->name('regions.move-up');
+    Route::post('regions/{region}/move-down', [AdminRegionController::class, 'moveDown'])->middleware(\App\Http\Middleware\RedirectIfNotAuthenticated::class)->name('regions.move-down');
     
     // Sub Regions Management  
     Route::resource('sub-regions', SubRegionController::class)->middleware(\App\Http\Middleware\RedirectIfNotAuthenticated::class);
     Route::post('sub-regions/translate', [SubRegionController::class, 'translate'])->middleware(\App\Http\Middleware\RedirectIfNotAuthenticated::class)->name('sub-regions.translate');
+    Route::post('sub-regions/{subRegion}/move-up', [SubRegionController::class, 'moveUp'])->middleware(\App\Http\Middleware\RedirectIfNotAuthenticated::class)->name('sub-regions.move-up');
+    Route::post('sub-regions/{subRegion}/move-down', [SubRegionController::class, 'moveDown'])->middleware(\App\Http\Middleware\RedirectIfNotAuthenticated::class)->name('sub-regions.move-down');
     
     // Archaeological Sites Management
     Route::resource('archaeological-sites', ArchaeologicalSiteController::class)->middleware(\App\Http\Middleware\RedirectIfNotAuthenticated::class);
@@ -43,23 +47,33 @@ Route::prefix('admin')->name('admin.')->group(function () {
         ->parameters(['models-3d' => 'model3d']);
     Route::post('models-3d/{model3d}/generate-qr', [Model3dController::class, 'generateQr'])->middleware(\App\Http\Middleware\RedirectIfNotAuthenticated::class)
         ->name('models-3d.generate-qr');
+    Route::post('models-3d/{model3d}/move-up', [Model3dController::class, 'moveUp'])->middleware(\App\Http\Middleware\RedirectIfNotAuthenticated::class)->name('models-3d.move-up');
+    Route::post('models-3d/{model3d}/move-down', [Model3dController::class, 'moveDown'])->middleware(\App\Http\Middleware\RedirectIfNotAuthenticated::class)->name('models-3d.move-down');
     
     // Onboarding Slides Management
     Route::resource('onboarding-slides', OnboardingSlideController::class)->middleware(\App\Http\Middleware\RedirectIfNotAuthenticated::class);
+    Route::post('onboarding-slides/{onboarding_slide}/move-up', [OnboardingSlideController::class, 'moveUp'])->middleware(\App\Http\Middleware\RedirectIfNotAuthenticated::class)->name('onboarding-slides.move-up');
+    Route::post('onboarding-slides/{onboarding_slide}/move-down', [OnboardingSlideController::class, 'moveDown'])->middleware(\App\Http\Middleware\RedirectIfNotAuthenticated::class)->name('onboarding-slides.move-down');
 
     // Stories Management
     Route::resource('stories', StoryController::class)->middleware(\App\Http\Middleware\RedirectIfNotAuthenticated::class);
     Route::post('stories/translate', [StoryController::class, 'translate'])->middleware(\App\Http\Middleware\RedirectIfNotAuthenticated::class)->name('stories.translate');
+    Route::post('stories/{story}/move-up', [StoryController::class, 'moveUp'])->middleware(\App\Http\Middleware\RedirectIfNotAuthenticated::class)->name('stories.move-up');
+    Route::post('stories/{story}/move-down', [StoryController::class, 'moveDown'])->middleware(\App\Http\Middleware\RedirectIfNotAuthenticated::class)->name('stories.move-down');
 
     // Articles Management
     Route::resource('articles', ArticleController::class)->middleware(\App\Http\Middleware\RedirectIfNotAuthenticated::class);
     Route::delete('articles/{article}/images/{image}', [ArticleController::class, 'deleteImage'])->middleware(\App\Http\Middleware\RedirectIfNotAuthenticated::class)->name('articles.delete-image');
     Route::post('articles/translate', [ArticleController::class, 'translate'])->middleware(\App\Http\Middleware\RedirectIfNotAuthenticated::class)->name('articles.translate');
+    Route::post('articles/{article}/move-up', [ArticleController::class, 'moveUp'])->middleware(\App\Http\Middleware\RedirectIfNotAuthenticated::class)->name('articles.move-up');
+    Route::post('articles/{article}/move-down', [ArticleController::class, 'moveDown'])->middleware(\App\Http\Middleware\RedirectIfNotAuthenticated::class)->name('articles.move-down');
 
     // News Management
     Route::resource('news', NewsController::class)->middleware(\App\Http\Middleware\RedirectIfNotAuthenticated::class);
     Route::delete('news/{news}/images/{image}', [NewsController::class, 'deleteImage'])->middleware(\App\Http\Middleware\RedirectIfNotAuthenticated::class)->name('news.delete-image');
     Route::post('news/translate', [NewsController::class, 'translate'])->middleware(\App\Http\Middleware\RedirectIfNotAuthenticated::class)->name('news.translate');
+    Route::post('news/{news}/move-up', [NewsController::class, 'moveUp'])->middleware(\App\Http\Middleware\RedirectIfNotAuthenticated::class)->name('news.move-up');
+    Route::post('news/{news}/move-down', [NewsController::class, 'moveDown'])->middleware(\App\Http\Middleware\RedirectIfNotAuthenticated::class)->name('news.move-down');
     
     // Test DeepL service
     Route::get('test-deepl', function() {
@@ -75,6 +89,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
     // Memories Management
     Route::resource('memories', MemoryController::class)->middleware(\App\Http\Middleware\RedirectIfNotAuthenticated::class);
     Route::post('memories/translate', [MemoryController::class, 'translate'])->middleware(\App\Http\Middleware\RedirectIfNotAuthenticated::class)->name('memories.translate');
+    Route::post('memories/{memory}/move-up', [MemoryController::class, 'moveUp'])->middleware(\App\Http\Middleware\RedirectIfNotAuthenticated::class)->name('memories.move-up');
+    Route::post('memories/{memory}/move-down', [MemoryController::class, 'moveDown'])->middleware(\App\Http\Middleware\RedirectIfNotAuthenticated::class)->name('memories.move-down');
 
     // Devices Management
     Route::get('devices/notifications', [DeviceController::class, 'notifications'])->middleware(\App\Http\Middleware\RedirectIfNotAuthenticated::class)->name('devices.notifications');

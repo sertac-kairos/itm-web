@@ -44,7 +44,26 @@ class ArticleController extends Controller
             $query->where('author', 'like', "%{$request->author}%");
         }
 
-        $articles = $query->ordered()->paginate(15)->withQueryString();
+        // Sorting
+        $sortField = $request->get('sort', 'sort_order');
+        $sortDirection = $request->get('direction', 'asc');
+        
+        if ($sortField === 'title') {
+            // Sort by translated title
+            $locale = app()->getLocale();
+            $query->leftJoin('article_translations', function($join) use ($locale) {
+                $join->on('articles.id', '=', 'article_translations.article_id')
+                     ->where('article_translations.locale', '=', $locale);
+            })
+            ->orderBy('article_translations.title', $sortDirection)
+            ->select('articles.*');
+        } elseif (in_array($sortField, ['id', 'author', 'sort_order', 'is_active', 'created_at', 'updated_at'])) {
+            $query->orderBy($sortField, $sortDirection);
+        } else {
+            $query->ordered();
+        }
+
+        $articles = $query->paginate(15)->withQueryString();
 
         return view('admin.articles.index', compact('articles'));
     }
@@ -245,6 +264,56 @@ class ArticleController extends Controller
         }
 
         return back()->with('error', 'Geçersiz resim.');
+    }
+
+    /**
+     * Move article up in sort order
+     */
+    public function moveUp(Article $article): RedirectResponse
+    {
+        // Find the previous item (lower sort_order)
+        $previous = Article::where('sort_order', '<', $article->sort_order)
+            ->orderBy('sort_order', 'desc')
+            ->first();
+        
+        if ($previous) {
+            // Swap sort orders
+            $tempOrder = $article->sort_order;
+            $article->sort_order = $previous->sort_order;
+            $previous->sort_order = $tempOrder;
+            
+            $article->save();
+            $previous->save();
+            
+            return redirect()->back()->with('success', 'Sıralama güncellendi.');
+        }
+        
+        return redirect()->back()->with('error', 'Makale zaten en üstte.');
+    }
+
+    /**
+     * Move article down in sort order
+     */
+    public function moveDown(Article $article): RedirectResponse
+    {
+        // Find the next item (higher sort_order)
+        $next = Article::where('sort_order', '>', $article->sort_order)
+            ->orderBy('sort_order', 'asc')
+            ->first();
+        
+        if ($next) {
+            // Swap sort orders
+            $tempOrder = $article->sort_order;
+            $article->sort_order = $next->sort_order;
+            $next->sort_order = $tempOrder;
+            
+            $article->save();
+            $next->save();
+            
+            return redirect()->back()->with('success', 'Sıralama güncellendi.');
+        }
+        
+        return redirect()->back()->with('error', 'Makale zaten en altta.');
     }
 
     /**

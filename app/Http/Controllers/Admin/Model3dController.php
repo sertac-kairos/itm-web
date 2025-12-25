@@ -42,7 +42,26 @@ class Model3dController extends Controller
             }
         }
 
-        $models3d = $query->ordered()->paginate(15)->withQueryString();
+        // Sorting
+        $sortField = $request->get('sort', 'sort_order');
+        $sortDirection = $request->get('direction', 'asc');
+        
+        if ($sortField === 'name') {
+            // Sort by translated name
+            $locale = app()->getLocale();
+            $query->leftJoin('model3d_translations', function($join) use ($locale) {
+                $join->on('model3d.id', '=', 'model3d_translations.model3d_id')
+                     ->where('model3d_translations.locale', '=', $locale);
+            })
+            ->orderBy('model3d_translations.name', $sortDirection)
+            ->select('model3d.*');
+        } elseif (in_array($sortField, ['id', 'archaeological_site_id', 'sort_order', 'is_active', 'created_at', 'updated_at'])) {
+            $query->orderBy($sortField, $sortDirection);
+        } else {
+            $query->ordered();
+        }
+
+        $models3d = $query->paginate(15)->withQueryString();
         $archaeologicalSites = ArchaeologicalSite::with('translations')->active()->get();
 
         return view('admin.models-3d.index', compact('models3d', 'archaeologicalSites'));
@@ -243,5 +262,57 @@ class Model3dController extends Controller
 
         return redirect()->route('admin.models-3d.index')
             ->with('success', '3D Model başarıyla silindi.');
+    }
+
+    /**
+     * Move 3D model up in sort order
+     */
+    public function moveUp(Model3d $model3d): RedirectResponse
+    {
+        // Find the previous item (lower sort_order) within the same archaeological site
+        $previous = Model3d::where('archaeological_site_id', $model3d->archaeological_site_id)
+            ->where('sort_order', '<', $model3d->sort_order)
+            ->orderBy('sort_order', 'desc')
+            ->first();
+        
+        if ($previous) {
+            // Swap sort orders
+            $tempOrder = $model3d->sort_order;
+            $model3d->sort_order = $previous->sort_order;
+            $previous->sort_order = $tempOrder;
+            
+            $model3d->save();
+            $previous->save();
+            
+            return redirect()->back()->with('success', 'Sıralama güncellendi.');
+        }
+        
+        return redirect()->back()->with('error', '3D Model zaten en üstte.');
+    }
+
+    /**
+     * Move 3D model down in sort order
+     */
+    public function moveDown(Model3d $model3d): RedirectResponse
+    {
+        // Find the next item (higher sort_order) within the same archaeological site
+        $next = Model3d::where('archaeological_site_id', $model3d->archaeological_site_id)
+            ->where('sort_order', '>', $model3d->sort_order)
+            ->orderBy('sort_order', 'asc')
+            ->first();
+        
+        if ($next) {
+            // Swap sort orders
+            $tempOrder = $model3d->sort_order;
+            $model3d->sort_order = $next->sort_order;
+            $next->sort_order = $tempOrder;
+            
+            $model3d->save();
+            $next->save();
+            
+            return redirect()->back()->with('success', 'Sıralama güncellendi.');
+        }
+        
+        return redirect()->back()->with('error', '3D Model zaten en altta.');
     }
 }

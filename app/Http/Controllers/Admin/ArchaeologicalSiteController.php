@@ -57,7 +57,26 @@ class ArchaeologicalSiteController extends Controller
             });
         }
 
-        $archaeologicalSites = $query->latest()->paginate(15)->withQueryString();
+        // Sorting
+        $sortField = $request->get('sort', 'created_at');
+        $sortDirection = $request->get('direction', 'desc');
+        
+        if ($sortField === 'name') {
+            // Sort by translated name
+            $locale = app()->getLocale();
+            $query->leftJoin('archaeological_site_translations', function($join) use ($locale) {
+                $join->on('archaeological_sites.id', '=', 'archaeological_site_translations.archaeological_site_id')
+                     ->where('archaeological_site_translations.locale', '=', $locale);
+            })
+            ->orderBy('archaeological_site_translations.name', $sortDirection)
+            ->select('archaeological_sites.*');
+        } elseif (in_array($sortField, ['id', 'sub_region_id', 'is_active', 'created_at', 'updated_at', 'latitude', 'longitude'])) {
+            $query->orderBy($sortField, $sortDirection);
+        } else {
+            $query->latest();
+        }
+
+        $archaeologicalSites = $query->paginate(15)->withQueryString();
         $regions = Region::with('translations')->active()->ordered()->get();
         $subRegions = SubRegion::with('translations')->active()->ordered()->get();
 

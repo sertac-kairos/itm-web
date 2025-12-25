@@ -31,7 +31,26 @@ class OnboardingSlideController extends Controller
             });
         }
 
-        $slides = $query->ordered()->paginate(15)->withQueryString();
+        // Sorting
+        $sortField = $request->get('sort', 'sort_order');
+        $sortDirection = $request->get('direction', 'asc');
+        
+        if ($sortField === 'title') {
+            // Sort by translated title
+            $locale = app()->getLocale();
+            $query->leftJoin('onboarding_slide_translations', function($join) use ($locale) {
+                $join->on('onboarding_slides.id', '=', 'onboarding_slide_translations.onboarding_slide_id')
+                     ->where('onboarding_slide_translations.locale', '=', $locale);
+            })
+            ->orderBy('onboarding_slide_translations.title', $sortDirection)
+            ->select('onboarding_slides.*');
+        } elseif (in_array($sortField, ['id', 'sort_order', 'is_active', 'created_at', 'updated_at'])) {
+            $query->orderBy($sortField, $sortDirection);
+        } else {
+            $query->ordered();
+        }
+
+        $slides = $query->paginate(15)->withQueryString();
 
         return view('admin.onboarding-slides.index', compact('slides'));
     }
@@ -222,5 +241,55 @@ class OnboardingSlideController extends Controller
         }
         $onboardingSlide->delete();
         return redirect()->route('admin.onboarding-slides.index')->with('success', 'Onboarding slaytı silindi.');
+    }
+
+    /**
+     * Move onboarding slide up in sort order
+     */
+    public function moveUp(OnboardingSlide $onboardingSlide): RedirectResponse
+    {
+        // Find the previous item (lower sort_order)
+        $previous = OnboardingSlide::where('sort_order', '<', $onboardingSlide->sort_order)
+            ->orderBy('sort_order', 'desc')
+            ->first();
+        
+        if ($previous) {
+            // Swap sort orders
+            $tempOrder = $onboardingSlide->sort_order;
+            $onboardingSlide->sort_order = $previous->sort_order;
+            $previous->sort_order = $tempOrder;
+            
+            $onboardingSlide->save();
+            $previous->save();
+            
+            return redirect()->back()->with('success', 'Sıralama güncellendi.');
+        }
+        
+        return redirect()->back()->with('error', 'Slayt zaten en üstte.');
+    }
+
+    /**
+     * Move onboarding slide down in sort order
+     */
+    public function moveDown(OnboardingSlide $onboardingSlide): RedirectResponse
+    {
+        // Find the next item (higher sort_order)
+        $next = OnboardingSlide::where('sort_order', '>', $onboardingSlide->sort_order)
+            ->orderBy('sort_order', 'asc')
+            ->first();
+        
+        if ($next) {
+            // Swap sort orders
+            $tempOrder = $onboardingSlide->sort_order;
+            $onboardingSlide->sort_order = $next->sort_order;
+            $next->sort_order = $tempOrder;
+            
+            $onboardingSlide->save();
+            $next->save();
+            
+            return redirect()->back()->with('success', 'Sıralama güncellendi.');
+        }
+        
+        return redirect()->back()->with('error', 'Slayt zaten en altta.');
     }
 }

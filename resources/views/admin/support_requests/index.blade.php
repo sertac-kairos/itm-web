@@ -60,13 +60,58 @@
                         <table class="table table-centered table-nowrap table-hover mb-0">
                             <thead class="table-light">
                                 <tr>
-                                    <th>ID</th>
-                                    <th>İsim</th>
-                                    <th>İletişim</th>
+                                    <th>
+                                        <a href="{{ route('admin.support-requests.index', array_merge(request()->except(['sort', 'direction']), ['sort' => 'id', 'direction' => request('direction') === 'asc' ? 'desc' : 'asc'])) }}" class="text-dark text-decoration-none">
+                                            ID
+                                            @if(request('sort') === 'id')
+                                                <i class="mdi mdi-chevron-{{ request('direction') === 'desc' ? 'down' : 'up' }}"></i>
+                                            @else
+                                                <i class="mdi mdi-chevron-up opacity-25"></i>
+                                            @endif
+                                        </a>
+                                    </th>
+                                    <th>
+                                        <a href="{{ route('admin.support-requests.index', array_merge(request()->except(['sort', 'direction']), ['sort' => 'name', 'direction' => request('direction') === 'asc' ? 'desc' : 'asc'])) }}" class="text-dark text-decoration-none">
+                                            İsim
+                                            @if(request('sort') === 'name')
+                                                <i class="mdi mdi-chevron-{{ request('direction') === 'desc' ? 'down' : 'up' }}"></i>
+                                            @else
+                                                <i class="mdi mdi-chevron-up opacity-25"></i>
+                                            @endif
+                                        </a>
+                                    </th>
+                                    <th>
+                                        <a href="{{ route('admin.support-requests.index', array_merge(request()->except(['sort', 'direction']), ['sort' => 'email', 'direction' => request('direction') === 'asc' ? 'desc' : 'asc'])) }}" class="text-dark text-decoration-none">
+                                            İletişim
+                                            @if(request('sort') === 'email')
+                                                <i class="mdi mdi-chevron-{{ request('direction') === 'desc' ? 'down' : 'up' }}"></i>
+                                            @else
+                                                <i class="mdi mdi-chevron-up opacity-25"></i>
+                                            @endif
+                                        </a>
+                                    </th>
                                     <th>Cihaz</th>
                                     <th>Mesaj</th>
-                                    <th>Durum</th>
-                                    <th>Tarih</th>
+                                    <th>
+                                        <a href="{{ route('admin.support-requests.index', array_merge(request()->except(['sort', 'direction']), ['sort' => 'status', 'direction' => request('direction') === 'asc' ? 'desc' : 'asc'])) }}" class="text-dark text-decoration-none">
+                                            Durum
+                                            @if(request('sort') === 'status')
+                                                <i class="mdi mdi-chevron-{{ request('direction') === 'desc' ? 'down' : 'up' }}"></i>
+                                            @else
+                                                <i class="mdi mdi-chevron-up opacity-25"></i>
+                                            @endif
+                                        </a>
+                                    </th>
+                                    <th>
+                                        <a href="{{ route('admin.support-requests.index', array_merge(request()->except(['sort', 'direction']), ['sort' => 'created_at', 'direction' => request('direction') === 'asc' ? 'desc' : 'asc'])) }}" class="text-dark text-decoration-none">
+                                            Tarih
+                                            @if(request('sort') === 'created_at' || !request('sort'))
+                                                <i class="mdi mdi-chevron-{{ request('direction') === 'desc' ? 'down' : 'up' }}"></i>
+                                            @else
+                                                <i class="mdi mdi-chevron-up opacity-25"></i>
+                                            @endif
+                                        </a>
+                                    </th>
                                     <th>İşlemler</th>
                                 </tr>
                             </thead>

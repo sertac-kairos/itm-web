@@ -162,13 +162,58 @@
                                             <label class="form-check-label" for="customCheck1">&nbsp;</label>
                                         </div>
                                     </th>
-                                    <th>Ören Yeri</th>
-                                    <th>Bölge</th>
-                                    <th>Koordinatlar</th>
+                                    <th>
+                                        <a href="{{ route('admin.archaeological-sites.index', array_merge(request()->except(['sort', 'direction']), ['sort' => 'name', 'direction' => request('direction') === 'asc' ? 'desc' : 'asc'])) }}" class="text-dark text-decoration-none">
+                                            Ören Yeri
+                                            @if(request('sort') === 'name' || request('sort') === 'id')
+                                                <i class="mdi mdi-chevron-{{ request('direction') === 'desc' ? 'down' : 'up' }}"></i>
+                                            @else
+                                                <i class="mdi mdi-chevron-up opacity-25"></i>
+                                            @endif
+                                        </a>
+                                    </th>
+                                    <th>
+                                        <a href="{{ route('admin.archaeological-sites.index', array_merge(request()->except(['sort', 'direction']), ['sort' => 'sub_region_id', 'direction' => request('direction') === 'asc' ? 'desc' : 'asc'])) }}" class="text-dark text-decoration-none">
+                                            Bölge
+                                            @if(request('sort') === 'sub_region_id')
+                                                <i class="mdi mdi-chevron-{{ request('direction') === 'desc' ? 'down' : 'up' }}"></i>
+                                            @else
+                                                <i class="mdi mdi-chevron-up opacity-25"></i>
+                                            @endif
+                                        </a>
+                                    </th>
+                                    <th>
+                                        <a href="{{ route('admin.archaeological-sites.index', array_merge(request()->except(['sort', 'direction']), ['sort' => 'latitude', 'direction' => request('direction') === 'asc' ? 'desc' : 'asc'])) }}" class="text-dark text-decoration-none">
+                                            Koordinatlar
+                                            @if(request('sort') === 'latitude' || request('sort') === 'longitude')
+                                                <i class="mdi mdi-chevron-{{ request('direction') === 'desc' ? 'down' : 'up' }}"></i>
+                                            @else
+                                                <i class="mdi mdi-chevron-up opacity-25"></i>
+                                            @endif
+                                        </a>
+                                    </th>
                                     <th>Özellikler</th>
                                     <th>İçerikler</th>
-                                    <th>Durum</th>
-                                    <th>Oluşturulma</th>
+                                    <th>
+                                        <a href="{{ route('admin.archaeological-sites.index', array_merge(request()->except(['sort', 'direction']), ['sort' => 'is_active', 'direction' => request('direction') === 'asc' ? 'desc' : 'asc'])) }}" class="text-dark text-decoration-none">
+                                            Durum
+                                            @if(request('sort') === 'is_active')
+                                                <i class="mdi mdi-chevron-{{ request('direction') === 'desc' ? 'down' : 'up' }}"></i>
+                                            @else
+                                                <i class="mdi mdi-chevron-up opacity-25"></i>
+                                            @endif
+                                        </a>
+                                    </th>
+                                    <th>
+                                        <a href="{{ route('admin.archaeological-sites.index', array_merge(request()->except(['sort', 'direction']), ['sort' => 'created_at', 'direction' => request('direction') === 'asc' ? 'desc' : 'asc'])) }}" class="text-dark text-decoration-none">
+                                            Oluşturulma
+                                            @if(request('sort') === 'created_at' || !request('sort'))
+                                                <i class="mdi mdi-chevron-{{ request('direction') === 'desc' ? 'down' : 'up' }}"></i>
+                                            @else
+                                                <i class="mdi mdi-chevron-up opacity-25"></i>
+                                            @endif
+                                        </a>
+                                    </th>
                                     <th style="width: 125px;">İşlemler</th>
                                 </tr>
                             </thead>

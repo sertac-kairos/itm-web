@@ -63,9 +63,36 @@
                             <thead class="table-light">
                                 <tr>
                                     <th>Görsel</th>
-                                    <th>Başlık</th>
-                                    <th>Sıra</th>
-                                    <th>Durum</th>
+                                    <th>
+                                        <a href="{{ route('admin.onboarding-slides.index', array_merge(request()->except(['sort', 'direction']), ['sort' => 'title', 'direction' => request('direction') === 'asc' ? 'desc' : 'asc'])) }}" class="text-dark text-decoration-none">
+                                            Başlık
+                                            @if(request('sort') === 'title' || request('sort') === 'id')
+                                                <i class="mdi mdi-chevron-{{ request('direction') === 'desc' ? 'down' : 'up' }}"></i>
+                                            @else
+                                                <i class="mdi mdi-chevron-up opacity-25"></i>
+                                            @endif
+                                        </a>
+                                    </th>
+                                    <th>
+                                        <a href="{{ route('admin.onboarding-slides.index', array_merge(request()->except(['sort', 'direction']), ['sort' => 'sort_order', 'direction' => request('direction') === 'asc' ? 'desc' : 'asc'])) }}" class="text-dark text-decoration-none">
+                                            Sıra
+                                            @if(request('sort') === 'sort_order' || !request('sort'))
+                                                <i class="mdi mdi-chevron-{{ request('direction') === 'desc' ? 'down' : 'up' }}"></i>
+                                            @else
+                                                <i class="mdi mdi-chevron-up opacity-25"></i>
+                                            @endif
+                                        </a>
+                                    </th>
+                                    <th>
+                                        <a href="{{ route('admin.onboarding-slides.index', array_merge(request()->except(['sort', 'direction']), ['sort' => 'is_active', 'direction' => request('direction') === 'asc' ? 'desc' : 'asc'])) }}" class="text-dark text-decoration-none">
+                                            Durum
+                                            @if(request('sort') === 'is_active')
+                                                <i class="mdi mdi-chevron-{{ request('direction') === 'desc' ? 'down' : 'up' }}"></i>
+                                            @else
+                                                <i class="mdi mdi-chevron-up opacity-25"></i>
+                                            @endif
+                                        </a>
+                                    </th>
                                     <th>İşlemler</th>
                                 </tr>
                             </thead>
@@ -85,7 +112,9 @@
                                                 <div class="text-muted small">{{ \Illuminate\Support\Str::limit($slide->description, 60) }}</div>
                                             @endif
                                         </td>
-                                        <td><span class="badge bg-secondary">{{ $slide->sort_order }}</span></td>
+                                        <td>
+                                            <span class="badge bg-secondary">{{ $slide->sort_order }}</span>
+                                        </td>
                                         <td>
                                             @if($slide->is_active)
                                                 <span class="badge bg-success">Aktif</span>

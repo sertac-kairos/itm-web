@@ -10,7 +10,7 @@ class SupportRequestController extends Controller
 {
     public function index(Request $request)
     {
-        $query = SupportRequest::query()->latest();
+        $query = SupportRequest::query();
 
         if ($request->filled('status')) {
             $query->where('status', $request->get('status'));
@@ -24,6 +24,16 @@ class SupportRequestController extends Controller
                   ->orWhere('phone', 'like', "%{$search}%")
                   ->orWhere('message', 'like', "%{$search}%");
             });
+        }
+
+        // Sorting
+        $sortField = $request->get('sort', 'created_at');
+        $sortDirection = $request->get('direction', 'desc');
+        
+        if (in_array($sortField, ['id', 'name', 'email', 'status', 'created_at'])) {
+            $query->orderBy($sortField, $sortDirection);
+        } else {
+            $query->latest();
         }
 
         $requests = $query->paginate(20)->withQueryString();
