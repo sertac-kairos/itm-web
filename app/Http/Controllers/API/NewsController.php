@@ -155,10 +155,7 @@ class NewsController extends Controller
                 ->ordered()
                 ->get();
 
-            return response()->json([
-                'success' => true,
-                'locale' => $locale,
-                'data' => $news->map(function (News $newsItem) {
+            $newsData = $news->map(function (News $newsItem) {
                     return [
                         'id' => $newsItem->id,
                         'slug' => $newsItem->slug,
@@ -180,22 +177,31 @@ class NewsController extends Controller
                         'created_at' => $newsItem->created_at?->format('Y-m-d H:i:s'),
                         'updated_at' => $newsItem->updated_at?->format('Y-m-d H:i:s'),
                     ];
-                })
+                })->toArray();
+            
+            return response()->json([
+                'success' => true,
+                'locale' => $locale,
+                'data' => $newsData
             ], 200);
 
         } catch (\Illuminate\Validation\ValidationException $e) {
             return response()->json([
-                'success' => false,
-                'message' => 'Geçersiz parametreler.',
-                'errors' => $e->errors()
-            ], 422);
+                'success' => true,
+                'locale' => app()->getLocale(),
+                'data' => []
+            ]);
 
         } catch (\Exception $e) {
+            \Log::error('NewsController::getByIds error: ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString()
+            ]);
+            
             return response()->json([
-                'success' => false,
-                'message' => 'Haberler getirilirken bir hata oluştu.',
-                'error' => config('app.debug') ? $e->getMessage() : 'Sunucu hatası'
-            ], 500);
+                'success' => true,
+                'locale' => app()->getLocale(),
+                'data' => []
+            ]);
         }
     }
 }

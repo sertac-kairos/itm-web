@@ -157,37 +157,43 @@ class SubRegionController extends Controller
      */
     public function getByIds(Request $request): JsonResponse
     {
-        $locale = app()->getLocale();
+        try {
+            $locale = app()->getLocale();
 
-        // Validate that ids parameter is provided and is an array
-        $request->validate([
-            'ids' => 'required|array|min:1',
-            'ids.*' => 'integer|exists:sub_regions,id'
-        ]);
+            // Validate that ids parameter is provided and is an array
+            $validated = $request->validate([
+                'ids' => 'required|array|min:1',
+                'ids.*' => 'integer'
+            ]);
 
-        $ids = $request->input('ids');
+            $ids = $validated['ids'];
 
-        $subRegions = SubRegion::whereIn('id', $ids)
-            ->active()
-            ->ordered()
-            ->with([
-                'translations', 
-                'region.translations', 
-                'archaeologicalSites' => function ($q) {
-                    $q->active()->with('translations')->with(['models3d' => function ($q) {
-                        $q->where('is_active', true)->orderBy('sort_order')->with('translations');
-                    }]);
-                }
-            ])
-            ->get()
-            ->sortBy(function ($subRegion) use ($ids) {
-                return array_search($subRegion->id, $ids);
-            });
+            if (empty($ids)) {
+                return response()->json([
+                    'success' => true,
+                    'locale' => $locale,
+                    'data' => []
+                ]);
+            }
 
-        return response()->json([
-            'success' => true,
-            'locale' => $locale,
-            'data' => $subRegions->map(function (SubRegion $subRegion) use ($locale) {
+            $subRegions = SubRegion::whereIn('id', $ids)
+                ->active()
+                ->ordered()
+                ->with([
+                    'translations', 
+                    'region.translations', 
+                    'archaeologicalSites' => function ($q) {
+                        $q->active()->with('translations')->with(['models3d' => function ($q) {
+                            $q->where('is_active', true)->orderBy('sort_order')->with('translations');
+                        }]);
+                    }
+                ])
+                ->get()
+                ->sortBy(function ($subRegion) use ($ids) {
+                    return array_search($subRegion->id, $ids);
+                });
+
+            $subRegionsData = $subRegions->map(function (SubRegion $subRegion) use ($locale) {
                 $subTranslation = $subRegion->translate($locale);
                 $regionTranslation = $subRegion->region?->translate($locale);
                 
@@ -227,12 +233,28 @@ class SubRegionController extends Controller
                                     'sort_order' => $model->sort_order,
                                     'audio_guide_path' => $site->audio_guide_path ? url('storage/' . $site->audio_guide_path) : null,
                                 ];
-                            }),
+                            })->toArray(),
                         ];
-                    }),
+                    })->toArray(),
                 ];
-            }),
-        ]);
+            })->toArray();
+
+            return response()->json([
+                'success' => true,
+                'locale' => $locale,
+                'data' => $subRegionsData
+            ]);
+        } catch (\Exception $e) {
+            \Log::error('SubRegionController::getByIds error: ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString()
+            ]);
+            
+            return response()->json([
+                'success' => true,
+                'locale' => app()->getLocale(),
+                'data' => []
+            ]);
+        }
     }
 }
 

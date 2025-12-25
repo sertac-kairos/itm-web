@@ -120,44 +120,50 @@ class ArchaeologicalSiteController extends Controller
      */
     public function getByIds(Request $request): JsonResponse
     {
-        $locale = app()->getLocale();
+        try {
+            $locale = app()->getLocale();
 
-        // Validate that ids parameter is provided and is an array
-        $request->validate([
-            'ids' => 'required|array|min:1',
-            'ids.*' => 'integer|exists:archaeological_sites,id'
-        ]);
+            // Validate that ids parameter is provided and is an array
+            $validated = $request->validate([
+                'ids' => 'required|array|min:1',
+                'ids.*' => 'integer'
+            ]);
 
-        $ids = $request->input('ids');
+            $ids = $validated['ids'];
 
-        $sites = ArchaeologicalSite::whereIn('id', $ids)
-            ->active()
-            ->with([
-                'translations',
-                'subRegion.translations',
-                'subRegion.region.translations',
-                'models3d' => function ($q) {
-                    $q->where('is_active', true)
-                      ->orderBy('sort_order')
-                      ->with('translations');
-                },
-                'audioGuides' => function ($q) {
-                    $q->where('is_active', true)
-                      ->with('translations');
-                },
-                'qrCodes' => function ($q) {
-                    $q->where('is_active', true);
-                }
-            ])
-            ->get()
-            ->sortBy(function ($site) use ($ids) {
-                return array_search($site->id, $ids);
-            });
+            if (empty($ids)) {
+                return response()->json([
+                    'success' => true,
+                    'locale' => $locale,
+                    'data' => []
+                ]);
+            }
 
-        return response()->json([
-            'success' => true,
-            'locale' => $locale,
-            'data' => $sites->map(function (ArchaeologicalSite $site) use ($locale) {
+            $sites = ArchaeologicalSite::whereIn('id', $ids)
+                ->active()
+                ->with([
+                    'translations',
+                    'subRegion.translations',
+                    'subRegion.region.translations',
+                    'models3d' => function ($q) {
+                        $q->where('is_active', true)
+                          ->orderBy('sort_order')
+                          ->with('translations');
+                    },
+                    'audioGuides' => function ($q) {
+                        $q->where('is_active', true)
+                          ->with('translations');
+                    },
+                    'qrCodes' => function ($q) {
+                        $q->where('is_active', true);
+                    }
+                ])
+                ->get()
+                ->sortBy(function ($site) use ($ids) {
+                    return array_search($site->id, $ids);
+                });
+
+            $sitesData = $sites->map(function (ArchaeologicalSite $site) use ($locale) {
                 $siteTranslation = $site->translate($locale);
                 $subRegionTranslation = $site->subRegion?->translate($locale);
                 $regionTranslation = $site->subRegion?->region?->translate($locale);
@@ -201,7 +207,7 @@ class ArchaeologicalSiteController extends Controller
                             'updated_at' => $model->updated_at,
                             'audio_guide_path' => $site->audio_guide_path ? url('storage/' . $site->audio_guide_path) : null,
                         ];
-                    }),
+                    })->toArray(),
                     'audio_guides' => $site->audioGuides->map(function ($audioGuide) use ($locale) {
                         $audioGuideTranslation = $audioGuide->translate($locale);
                         
@@ -216,7 +222,7 @@ class ArchaeologicalSiteController extends Controller
                             'created_at' => $audioGuide->created_at,
                             'updated_at' => $audioGuide->updated_at,
                         ];
-                    }),
+                    })->toArray(),
                     'qr_codes' => $site->qrCodes->map(function ($qrCode) {
                         return [
                             'id' => $qrCode->id,
@@ -226,10 +232,26 @@ class ArchaeologicalSiteController extends Controller
                             'created_at' => $qrCode->created_at,
                             'updated_at' => $qrCode->updated_at,
                         ];
-                    }),
+                    })->toArray(),
                 ];
-            }),
-        ]);
+            })->toArray();
+
+            return response()->json([
+                'success' => true,
+                'locale' => $locale,
+                'data' => $sitesData
+            ]);
+        } catch (\Exception $e) {
+            \Log::error('ArchaeologicalSiteController::getByIds error: ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString()
+            ]);
+            
+            return response()->json([
+                'success' => true,
+                'locale' => app()->getLocale(),
+                'data' => []
+            ]);
+        }
     }
 }
 

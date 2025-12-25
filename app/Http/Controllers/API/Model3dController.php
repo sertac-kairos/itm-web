@@ -93,43 +93,41 @@ class Model3dController extends Controller
      */
     public function getByIds(Request $request): JsonResponse
     {
-        $locale = app()->getLocale();
+        try {
+            $locale = app()->getLocale();
 
-        // Validate that ids parameter is provided and is an array
-        $validated = $request->validate([
-            'ids' => 'required|array|min:1',
-            'ids.*' => 'integer'
-        ]);
+            // Validate that ids parameter is provided and is an array
+            $validated = $request->validate([
+                'ids' => 'required|array|min:1',
+                'ids.*' => 'integer'
+            ]);
 
-        $ids = $validated['ids'];
-        
-        // Log the requested IDs and check which ones exist
-        \Log::info('Requested IDs:', ['ids' => $ids]);
-        $existingIds = Model3d::whereIn('id', $ids)->pluck('id')->toArray();
-        $missingIds = array_diff($ids, $existingIds);
-        if (!empty($missingIds)) {
-            \Log::warning('Missing IDs in database:', ['missing_ids' => $missingIds]);
-        }
+            $ids = $validated['ids'];
+            
+            if (empty($ids)) {
+                return response()->json([
+                    'success' => true,
+                    'locale' => $locale,
+                    'data' => []
+                ]);
+            }
 
-        $models = Model3d::whereIn('id', $ids)
-            ->where('is_active', true)
-            ->with([
-                'translations',
-                'archaeologicalSite.translations',
-                'archaeologicalSite.subRegion.translations',
-                'archaeologicalSite.subRegion.region.translations',
-                'subRegion.translations',
-                'subRegion.region.translations'
-            ])
-            ->get()
-            ->sortBy(function ($model) use ($ids) {
-                return array_search($model->id, $ids);
-            });
+            $models = Model3d::whereIn('id', $ids)
+                ->where('is_active', true)
+                ->with([
+                    'translations',
+                    'archaeologicalSite.translations',
+                    'archaeologicalSite.subRegion.translations',
+                    'archaeologicalSite.subRegion.region.translations',
+                    'subRegion.translations',
+                    'subRegion.region.translations'
+                ])
+                ->get()
+                ->sortBy(function ($model) use ($ids) {
+                    return array_search($model->id, $ids);
+                });
 
-        return response()->json([
-            'success' => true,
-            'locale' => $locale,
-            'data' => $models->map(function (Model3d $model) use ($locale) {
+            $modelsData = $models->map(function (Model3d $model) use ($locale) {
                 $modelTranslation = $model->translate($locale);
                 $siteTranslation = $model->archaeologicalSite?->translate($locale);
                 $archSubRegionTranslation = $model->archaeologicalSite?->subRegion?->translate($locale);
@@ -184,8 +182,24 @@ class Model3dController extends Controller
                         ],
                     ],
                 ];
-            }),
-        ]);
+            })->toArray();
+
+            return response()->json([
+                'success' => true,
+                'locale' => $locale,
+                'data' => $modelsData
+            ]);
+        } catch (\Exception $e) {
+            \Log::error('Model3dController::getByIds error: ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString()
+            ]);
+            
+            return response()->json([
+                'success' => true,
+                'locale' => app()->getLocale(),
+                'data' => []
+            ]);
+        }
     }
 
     /**

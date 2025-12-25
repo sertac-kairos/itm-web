@@ -139,34 +139,40 @@ class RegionController extends Controller
      */
     public function getByIds(Request $request): JsonResponse
     {
-        $locale = app()->getLocale();
+        try {
+            $locale = app()->getLocale();
 
-        // Validate that ids parameter is provided and is an array
-        $request->validate([
-            'ids' => 'required|array|min:1',
-            'ids.*' => 'integer|exists:regions,id'
-        ]);
+            // Validate that ids parameter is provided and is an array
+            $validated = $request->validate([
+                'ids' => 'required|array|min:1',
+                'ids.*' => 'integer'
+            ]);
 
-        $ids = $request->input('ids');
+            $ids = $validated['ids'];
 
-        $regions = Region::whereIn('id', $ids)
-            ->active()
-            ->ordered()
-            ->with([
-                'translations',
-                'subRegions' => function ($query) {
-                    $query->active()->ordered()->with('translations');
-                }
-            ])
-            ->get()
-            ->sortBy(function ($region) use ($ids) {
-                return array_search($region->id, $ids);
-            });
+            if (empty($ids)) {
+                return response()->json([
+                    'success' => true,
+                    'locale' => $locale,
+                    'data' => []
+                ]);
+            }
 
-        return response()->json([
-            'success' => true,
-            'locale' => $locale,
-            'data' => $regions->map(function ($region) use ($locale) {
+            $regions = Region::whereIn('id', $ids)
+                ->active()
+                ->ordered()
+                ->with([
+                    'translations',
+                    'subRegions' => function ($query) {
+                        $query->active()->ordered()->with('translations');
+                    }
+                ])
+                ->get()
+                ->sortBy(function ($region) use ($ids) {
+                    return array_search($region->id, $ids);
+                });
+
+            $regionsData = $regions->map(function ($region) use ($locale) {
                 $translation = $region->translate($locale);
                 
                 return [
@@ -195,9 +201,25 @@ class RegionController extends Controller
                             'image' => $subRegion->image ? url('storage/' . $subRegion->image) : null,
                             'audio_guide' => $subRegion->audio_guide_path ? url('storage/' . $subRegion->audio_guide_path) : null,
                         ];
-                    }),
+                    })->toArray(),
                 ];
-            }),
-        ]);
+            })->toArray();
+
+            return response()->json([
+                'success' => true,
+                'locale' => $locale,
+                'data' => $regionsData
+            ]);
+        } catch (\Exception $e) {
+            \Log::error('RegionController::getByIds error: ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString()
+            ]);
+            
+            return response()->json([
+                'success' => true,
+                'locale' => app()->getLocale(),
+                'data' => []
+            ]);
+        }
     }
 }

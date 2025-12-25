@@ -121,29 +121,40 @@ class ArticleController extends Controller
      */
     public function getByIds(Request $request): JsonResponse
     {
-        $locale = app()->getLocale();
+        try {
+            $locale = app()->getLocale();
 
-        // Validate that ids parameter is provided and is an array
-        $request->validate([
-            'ids' => 'required|array|min:1',
-            'ids.*' => 'integer|exists:articles,id'
-        ]);
+            // Validate that ids parameter is provided and is an array
+            $validated = $request->validate([
+                'ids' => 'required|array|min:1',
+                'ids.*' => 'integer'
+            ]);
 
-        $ids = $request->input('ids');
+            $ids = $validated['ids'];
 
-        $articles = Article::whereIn('id', $ids)
-            ->active()
-            ->with([
-                'translations',
-                'images'
-            ])
-            ->get()
-            ->sortBy(function ($article) use ($ids) {
-                return array_search($article->id, $ids);
-            });
+            if (empty($ids)) {
+                return response()->json([
+                    'success' => true,
+                    'data' => [],
+                    'meta' => [
+                        'total' => 0,
+                        'locale' => $locale,
+                    ]
+                ]);
+            }
 
-            $articlesData = $articles->map(function ($article) use ($request) {
-        $locale = app()->getLocale();
+            $articles = Article::whereIn('id', $ids)
+                ->active()
+                ->with([
+                    'translations',
+                    'images'
+                ])
+                ->get()
+                ->sortBy(function ($article) use ($ids) {
+                    return array_search($article->id, $ids);
+                });
+
+            $articlesData = $articles->map(function ($article) use ($locale) {
                 $translation = $article->translate($locale);
                 
                 return [
@@ -162,20 +173,34 @@ class ArticleController extends Controller
                             'alt_text' => $image->alt_text,
                             'sort_order' => $image->sort_order,
                         ];
-                    }),
+                    })->toArray(),
                     'images_count' => $article->images_count,
-                    'locale' => app()->getLocale(),
+                    'locale' => $locale,
                     'available_translations' => $article->translations->pluck('locale')->toArray(),
                 ];
-            });
+            })->toArray();
     
             return response()->json([
                 'success' => true,
                 'data' => $articlesData,
                 'meta' => [
-                    'total' => $articlesData->count(),
+                    'total' => count($articlesData),
+                    'locale' => $locale,
+                ]
+            ]);
+        } catch (\Exception $e) {
+            \Log::error('ArticleController::getByIds error: ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString()
+            ]);
+            
+            return response()->json([
+                'success' => true,
+                'data' => [],
+                'meta' => [
+                    'total' => 0,
                     'locale' => app()->getLocale(),
                 ]
             ]);
+        }
     }
 }

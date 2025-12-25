@@ -109,51 +109,77 @@ class MemoryController extends Controller
      */
     public function getByIds(Request $request): JsonResponse
     {
-        $locale = app()->getLocale();
+        try {
+            $locale = app()->getLocale();
 
-        // Validate that ids parameter is provided and is an array
-        $request->validate([
-            'ids' => 'required|array|min:1',
-            'ids.*' => 'integer|exists:memories,id'
-        ]);
+            // Validate that ids parameter is provided and is an array
+            $validated = $request->validate([
+                'ids' => 'required|array|min:1',
+                'ids.*' => 'integer'
+            ]);
 
-        $ids = $request->input('ids');
+            $ids = $validated['ids'];
 
-        $memories = Memory::whereIn('id', $ids)
-            ->active()
-            ->with([
-                'translations'
-            ])
-            ->get()
-            ->sortBy(function ($memory) use ($ids) {
-                return array_search($memory->id, $ids);
-            });
+            if (empty($ids)) {
+                return response()->json([
+                    'success' => true,
+                    'data' => [],
+                    'meta' => [
+                        'total' => 0,
+                        'locale' => $locale,
+                    ]
+                ]);
+            }
 
-        $memoriesData = $memories->map(function ($memory) {
-            return [
-                'id' => $memory->id,
-                'image' => $memory->image_url,
-                'link' => $memory->formatted_link,
-                'has_link' => $memory->hasLink(),
-                'author' => $memory->author,
-                'sort_order' => $memory->sort_order,
-                'is_active' => $memory->is_active,
-                'created_at' => $memory->created_at->toISOString(),
-                'updated_at' => $memory->updated_at->toISOString(),
-                'title' => $memory->title ?: '',
-                'content' => $memory->content ?: '',
-                'locale' => app()->getLocale(),
-                'available_translations' => $memory->translations->pluck('locale')->toArray(),
-            ];
-        });
+            $memories = Memory::whereIn('id', $ids)
+                ->active()
+                ->with([
+                    'translations'
+                ])
+                ->get()
+                ->sortBy(function ($memory) use ($ids) {
+                    return array_search($memory->id, $ids);
+                });
 
-        return response()->json([
-            'success' => true,
-            'data' => $memoriesData,
-            'meta' => [
-                'total' => $memoriesData->count(),
-                'locale' => app()->getLocale(),
-            ]
-        ]);
+            $memoriesData = $memories->map(function ($memory) use ($locale) {
+                return [
+                    'id' => $memory->id,
+                    'image' => $memory->image_url,
+                    'link' => $memory->formatted_link,
+                    'has_link' => $memory->hasLink(),
+                    'author' => $memory->author,
+                    'sort_order' => $memory->sort_order,
+                    'is_active' => $memory->is_active,
+                    'created_at' => $memory->created_at->toISOString(),
+                    'updated_at' => $memory->updated_at->toISOString(),
+                    'title' => $memory->title ?: '',
+                    'content' => $memory->content ?: '',
+                    'locale' => $locale,
+                    'available_translations' => $memory->translations->pluck('locale')->toArray(),
+                ];
+            })->toArray();
+
+            return response()->json([
+                'success' => true,
+                'data' => $memoriesData,
+                'meta' => [
+                    'total' => count($memoriesData),
+                    'locale' => $locale,
+                ]
+            ]);
+        } catch (\Exception $e) {
+            \Log::error('MemoryController::getByIds error: ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString()
+            ]);
+            
+            return response()->json([
+                'success' => true,
+                'data' => [],
+                'meta' => [
+                    'total' => 0,
+                    'locale' => app()->getLocale(),
+                ]
+            ]);
+        }
     }
 }
