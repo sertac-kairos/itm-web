@@ -14,7 +14,7 @@ class StoryController extends Controller
      */
     public function index(Request $request): JsonResponse
     {
-        $query = Story::with(['translations', 'model3d.translations'])->active();
+        $query = Story::with(['translations', 'model3d.translations', 'model3d.archaeologicalSite.translations'])->active();
 
         // Apply search filter if provided
         if ($request->filled('search')) {
@@ -39,6 +39,7 @@ class StoryController extends Controller
                     'sketchfab_thumbnail_url' => $story->model3d->sketchfab_thumbnail_url,
                     'qr_uuid' => $story->model3d->qr_uuid,
                     'qr_image_path' => $story->model3d->qr_image_path ? asset('storage/' . $story->model3d->qr_image_path) : null,
+                    'audio_guide_path' => $story->model3d->archaeologicalSite?->audio_guide_path ? url('storage/' . $story->model3d->archaeologicalSite->audio_guide_path) : null,
                     'locale' => app()->getLocale(),
                     'available_translations' => $story->model3d->translations->pluck('locale')->toArray(),
                 ];
@@ -82,7 +83,7 @@ class StoryController extends Controller
             ], 404);
         }
 
-        $story->load(['translations', 'model3d.translations']);
+        $story->load(['translations', 'model3d.translations', 'model3d.archaeologicalSite.translations']);
         
         $model3dData = null;
         if ($story->model3d) {
@@ -94,6 +95,7 @@ class StoryController extends Controller
                 'sketchfab_thumbnail_url' => $story->model3d->sketchfab_thumbnail_url,
                 'qr_uuid' => $story->model3d->qr_uuid,
                 'qr_image_path' => $story->model3d->qr_image_path ? asset('storage/' . $story->model3d->qr_image_path) : null,
+                'audio_guide_path' => $story->model3d->archaeologicalSite?->audio_guide_path ? url('storage/' . $story->model3d->archaeologicalSite->audio_guide_path) : null,
                 'locale' => app()->getLocale(),
                 'available_translations' => $story->model3d->translations->pluck('locale')->toArray(),
             ];
