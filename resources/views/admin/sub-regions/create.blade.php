@@ -305,8 +305,8 @@
                             <span class="coordinates-preview">Koordinat bilgisi</span>
                         </div>
                         <div class="mt-2">
-                            <span class="badge badge-success-lighten subregion-status-preview">Aktif</span>
-                            <span class="badge badge-dark-lighten subregion-order-preview">Sıra: 0</span>
+                            <span class="badge badge bg-success text-white subregion-status-preview">Aktif</span>
+                            <span class="badge badge bg-dark text-white subregion-order-preview">Sıra: 0</span>
                         </div>
                     </div>
                 </div>
@@ -893,10 +893,10 @@
             const statusBadge = document.querySelector('.subregion-status-preview');
             if (isActive) {
                 statusBadge.textContent = 'Aktif';
-                statusBadge.className = 'badge badge-success-lighten subregion-status-preview';
+                statusBadge.className = 'badge badge bg-success text-white subregion-status-preview';
             } else {
                 statusBadge.textContent = 'Pasif';
-                statusBadge.className = 'badge badge-danger-lighten subregion-status-preview';
+                statusBadge.className = 'badge badge bg-danger text-white subregion-status-preview';
             }
         }
 

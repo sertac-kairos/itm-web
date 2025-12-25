@@ -334,11 +334,11 @@
                             <span class="coordinates-preview">{{ number_format($archaeologicalSite->latitude, 6) }}°, {{ number_format($archaeologicalSite->longitude, 6) }}°</span>
                         </div>
                         <div class="mt-2">
-                            <span class="badge {{ $archaeologicalSite->is_active ? 'badge-success-lighten' : 'badge-danger-lighten' }} site-status-preview">
+                            <span class="badge {{ $archaeologicalSite->is_active ? 'badge bg-success text-white' : 'badge bg-danger text-white' }} site-status-preview">
                                 {{ $archaeologicalSite->is_active ? 'Aktif' : 'Pasif' }}
                             </span>
                             @if($archaeologicalSite->is_nearby_enabled)
-                                <span class="badge badge-info-lighten site-nearby-preview">Yakındaki Aktif</span>
+                                <span class="badge badge bg-info text-white site-nearby-preview">Yakındaki Aktif</span>
                             @endif
                         </div>
                     </div>
@@ -1180,13 +1180,13 @@
 
                 statusBadge.textContent = 'Aktif';
 
-                statusBadge.className = 'badge badge-success-lighten site-status-preview';
+                statusBadge.className = 'badge badge bg-success text-white site-status-preview';
 
             } else {
 
                 statusBadge.textContent = 'Pasif';
 
-                statusBadge.className = 'badge badge-danger-lighten site-status-preview';
+                statusBadge.className = 'badge badge bg-danger text-white site-status-preview';
 
             }
 
@@ -1200,7 +1200,7 @@
 
                     nearbyBadge.textContent = 'Yakındaki Aktif';
 
-                    nearbyBadge.className = 'badge badge-info-lighten site-nearby-preview';
+                    nearbyBadge.className = 'badge badge bg-info text-white site-nearby-preview';
 
                     nearbyBadge.style.display = '';
 

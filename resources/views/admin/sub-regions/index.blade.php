@@ -90,7 +90,7 @@
                         <h4 class="mb-0">
                             <i class="mdi mdi-map-marker-path text-success me-2"></i>
                             Alt Bölgeler
-                            <span class="badge badge-success-lighten ms-2">{{ $subRegions->total() }} Alt Bölge</span>
+                            <span class="badge bg-success text-white ms-2">{{ $subRegions->total() }} Alt Bölge</span>
                         </h4>
                         <p class="text-muted mb-0">
                             @if(request('region_id'))
@@ -216,15 +216,15 @@
                                             </div>
                                         </td>
                                         <td>
-                                            <span class="badge badge-dark-lighten">{{ $subRegion->sort_order }}</span>
+                                            <span class="badge badge bg-dark text-white">{{ $subRegion->sort_order }}</span>
                                         </td>
                                         <td>
                                             @if($subRegion->is_active)
-                                                <span class="badge badge-success-lighten">
+                                                <span class="badge bg-success text-white">
                                                     <i class="mdi mdi-check-circle me-1"></i>Aktif
                                                 </span>
                                             @else
-                                                <span class="badge badge-danger-lighten">
+                                                <span class="badge bg-danger text-white">
                                                     <i class="mdi mdi-close-circle me-1"></i>Pasif
                                                 </span>
                                             @endif

@@ -52,11 +52,11 @@
                             <td class="fw-medium">Durum:</td>
                             <td>
                                 @if($memory->is_active)
-                                    <span class="badge badge-success-lighten">
+                                    <span class="badge badge bg-success text-white">
                                         <i class="mdi mdi-check-circle me-1"></i>Aktif
                                     </span>
                                 @else
-                                    <span class="badge badge-danger-lighten">
+                                    <span class="badge badge bg-danger text-white">
                                         <i class="mdi mdi-close-circle me-1"></i>Pasif
                                     </span>
                                 @endif

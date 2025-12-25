@@ -44,7 +44,7 @@
                         <h4 class="mb-0">
                             <i class="mdi mdi-map-marker-multiple text-primary me-2"></i>
                             Tüm Bölgeler
-                            <span class="badge badge-primary-lighten ms-2">{{ $regions->total() }} Bölge</span>
+                            <span class="badge badge bg-primary text-white ms-2">{{ $regions->total() }} Bölge</span>
                         </h4>
                         <p class="text-muted mb-0">İzmir Time Machine uygulaması için tanımlı bölgeleri yönetin</p>
                     </div>
@@ -128,7 +128,7 @@
                                             </div>
                                         </td>
                                         <td>
-                                            <span class="badge badge-primary-lighten">
+                                            <span class="badge badge bg-primary text-white">
                                                 {{ $region->subRegions->count() }} Alt Bölge
                                             </span>
                                         </td>
@@ -142,15 +142,15 @@
                                             @endif
                                         </td>
                                         <td>
-                                            <span class="badge badge-dark-lighten">{{ $region->sort_order }}</span>
+                                            <span class="badge badge bg-dark text-white">{{ $region->sort_order }}</span>
                                         </td>
                                         <td>
                                             @if($region->is_active)
-                                                <span class="badge badge-success-lighten">
+                                                <span class="badge bg-success text-white">
                                                     <i class="mdi mdi-check-circle me-1"></i>Aktif
                                                 </span>
                                             @else
-                                                <span class="badge badge-danger-lighten">
+                                                <span class="badge bg-danger text-white">
                                                     <i class="mdi mdi-close-circle me-1"></i>Pasif
                                                 </span>
                                             @endif

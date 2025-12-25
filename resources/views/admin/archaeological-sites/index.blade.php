@@ -109,7 +109,7 @@
                         <h4 class="mb-0">
                             <i class="mdi mdi-castle text-danger me-2"></i>
                             Ören Yerleri
-                            <span class="badge badge-danger-lighten ms-2">{{ $archaeologicalSites->total() }} Ören Yeri</span>
+                            <span class="badge bg-danger text-white ms-2">{{ $archaeologicalSites->total() }} Ören Yeri</span>
                         </h4>
                         <p class="text-muted mb-0">
                             @if(request('region_id') || request('sub_region_id'))
@@ -251,11 +251,11 @@
                                         </td>
                                         <td>
                                             @if($site->is_active)
-                                                <span class="badge badge-success-lighten">
+                                                <span class="badge bg-success text-white">
                                                     <i class="mdi mdi-check-circle me-1"></i>Aktif
                                                 </span>
                                             @else
-                                                <span class="badge badge-danger-lighten">
+                                                <span class="badge bg-danger text-white">
                                                     <i class="mdi mdi-close-circle me-1"></i>Pasif
                                                 </span>
                                             @endif

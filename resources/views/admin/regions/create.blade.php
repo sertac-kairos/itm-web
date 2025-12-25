@@ -274,8 +274,8 @@
                         </div>
                         <p class="text-muted mb-0 region-desc-preview small">Bölge açıklaması burada görünecek...</p>
                         <div class="mt-2">
-                            <span class="badge badge-success-lighten region-status-preview">Aktif</span>
-                            <span class="badge badge-dark-lighten region-order-preview">Sıra: 0</span>
+                            <span class="badge badge bg-success text-white region-status-preview">Aktif</span>
+                            <span class="badge badge bg-dark text-white region-order-preview">Sıra: 0</span>
                         </div>
                     </div>
                 </div>
@@ -875,10 +875,10 @@
             const statusBadge = document.querySelector('.region-status-preview');
             if (isActive) {
                 statusBadge.textContent = 'Aktif';
-                statusBadge.className = 'badge badge-success-lighten region-status-preview';
+                statusBadge.className = 'badge badge bg-success text-white region-status-preview';
             } else {
                 statusBadge.textContent = 'Pasif';
-                statusBadge.className = 'badge badge-danger-lighten region-status-preview';
+                statusBadge.className = 'badge badge bg-danger text-white region-status-preview';
             }
         }
 

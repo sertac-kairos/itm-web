@@ -159,9 +159,9 @@
                                         </td>
                                         <td>
                                             @if($region->is_active)
-                                                <span class="badge badge-success-lighten">Aktif</span>
+                                                <span class="badge bg-success text-white">Aktif</span>
                                             @else
-                                                <span class="badge badge-danger-lighten">Pasif</span>
+                                                <span class="badge bg-danger text-white">Pasif</span>
                                             @endif
                                         </td>
                                         <td>{{ $region->created_at->diffForHumans() }}</td>

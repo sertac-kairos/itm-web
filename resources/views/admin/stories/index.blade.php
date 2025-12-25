@@ -43,7 +43,7 @@
                         <h4 class="mb-0">
                             <i class="mdi mdi-book-open-page-variant text-primary me-2"></i>
                             Tüm Hikayeler
-                            <span class="badge badge-primary-lighten ms-2">{{ $stories->total() }} Hikaye</span>
+                            <span class="badge badge bg-primary text-white ms-2">{{ $stories->total() }} Hikaye</span>
                         </h4>
                         <p class="text-muted mb-0">İzmir Time Machine uygulaması için tanımlı hikayeleri yönetin</p>
                     </div>
@@ -155,13 +155,13 @@
                                             </div>
                                         </td>
                                         <td>
-                                            <span class="badge badge-secondary-lighten">{{ $story->sort_order }}</span>
+                                            <span class="badge badge bg-secondary text-white">{{ $story->sort_order }}</span>
                                         </td>
                                         <td>
                                             @if($story->is_active)
-                                                <span class="badge badge-success-lighten">Aktif</span>
+                                                <span class="badge bg-success text-white">Aktif</span>
                                             @else
-                                                <span class="badge badge-danger-lighten">Pasif</span>
+                                                <span class="badge bg-danger text-white">Pasif</span>
                                             @endif
                                         </td>
                                         <td>{{ $story->created_at->diffForHumans() }}</td>

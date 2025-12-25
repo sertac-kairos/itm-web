@@ -289,8 +289,8 @@
                             <span class="coordinates-preview">Koordinat bilgisi</span>
                         </div>
                         <div class="mt-2">
-                            <span class="badge badge-success-lighten site-status-preview">Aktif</span>
-                            <span class="badge badge-info-lighten site-nearby-preview">Yakındaki Aktif</span>
+                            <span class="badge badge bg-success text-white site-status-preview">Aktif</span>
+                            <span class="badge badge bg-info text-white site-nearby-preview">Yakındaki Aktif</span>
                         </div>
                     </div>
                 </div>
@@ -960,16 +960,16 @@
             const statusBadge = document.querySelector('.site-status-preview');
             if (isActive) {
                 statusBadge.textContent = 'Aktif';
-                statusBadge.className = 'badge badge-success-lighten site-status-preview';
+                statusBadge.className = 'badge badge bg-success text-white site-status-preview';
             } else {
                 statusBadge.textContent = 'Pasif';
-                statusBadge.className = 'badge badge-danger-lighten site-status-preview';
+                statusBadge.className = 'badge badge bg-danger text-white site-status-preview';
             }
 
             const nearbyBadge = document.querySelector('.site-nearby-preview');
             if (isNearbyEnabled) {
                 nearbyBadge.textContent = 'Yakındaki Aktif';
-                nearbyBadge.className = 'badge badge-info-lighten site-nearby-preview';
+                nearbyBadge.className = 'badge badge bg-info text-white site-nearby-preview';
                 nearbyBadge.style.display = '';
             } else {
                 nearbyBadge.style.display = 'none';

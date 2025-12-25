@@ -42,17 +42,17 @@
                                 <p class="text-muted mb-1">{{ $subRegion->region->name }} bölgesine bağlı alt bölge</p>
                                 <div class="d-flex align-items-center">
                                     @if($subRegion->is_active)
-                                        <span class="badge badge-success-lighten me-2">
+                                        <span class="badge badge bg-success text-white me-2">
                                             <i class="mdi mdi-check-circle me-1"></i>Aktif
                                         </span>
                                     @else
-                                        <span class="badge badge-danger-lighten me-2">
+                                        <span class="badge badge bg-danger text-white me-2">
                                             <i class="mdi mdi-close-circle me-1"></i>Pasif
                                         </span>
                                     @endif
-                                    <span class="badge badge-dark-lighten me-2">Sıra: {{ $subRegion->sort_order }}</span>
+                                    <span class="badge badge bg-dark text-white me-2">Sıra: {{ $subRegion->sort_order }}</span>
                                     @if($subRegion->latitude && $subRegion->longitude)
-                                        <span class="badge badge-info-lighten">
+                                        <span class="badge badge bg-info text-white">
                                             <i class="mdi mdi-map-marker me-1"></i>
                                             {{ number_format($subRegion->latitude, 4) }}°, {{ number_format($subRegion->longitude, 4) }}°
                                         </span>
@@ -119,11 +119,11 @@
                                     </td>
                                     <td>
                                         @if($translation && $translation->name)
-                                            <span class="badge badge-success-lighten">
+                                            <span class="badge badge bg-success text-white">
                                                 <i class="mdi mdi-check me-1"></i>Mevcut
                                             </span>
                                         @else
-                                            <span class="badge badge-warning-lighten">
+                                            <span class="badge badge bg-warning text-white">
                                                 <i class="mdi mdi-close me-1"></i>Eksik
                                             </span>
                                         @endif
@@ -213,9 +213,9 @@
                                         </td>
                                         <td>
                                             @if($site->is_active)
-                                                <span class="badge badge-success-lighten">Aktif</span>
+                                                <span class="badge badge bg-success text-white">Aktif</span>
                                             @else
-                                                <span class="badge badge-danger-lighten">Pasif</span>
+                                                <span class="badge badge bg-danger text-white">Pasif</span>
                                             @endif
                                         </td>
                                         <td>
@@ -269,9 +269,9 @@
                                 <td class="fw-semibold">Durum:</td>
                                 <td class="text-end">
                                     @if($subRegion->is_active)
-                                        <span class="badge badge-success-lighten">Aktif</span>
+                                        <span class="badge badge bg-success text-white">Aktif</span>
                                     @else
-                                        <span class="badge badge-danger-lighten">Pasif</span>
+                                        <span class="badge badge bg-danger text-white">Pasif</span>
                                     @endif
                                 </td>
                             </tr>

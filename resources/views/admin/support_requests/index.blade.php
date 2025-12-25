@@ -85,7 +85,7 @@
                                         <td>{{ Str::limit($req->message, 80) }}</td>
                                         <td>
                                             @php $statusMap = ['open' => 'Açık', 'in_progress' => 'Devam', 'resolved' => 'Çözüldü', 'closed' => 'Kapalı']; @endphp
-                                            <span class="badge {{ $req->status === 'open' ? 'badge-danger-lighten' : ($req->status === 'in_progress' ? 'badge-warning-lighten' : 'badge-success-lighten') }}">{{ $statusMap[$req->status] ?? $req->status }}</span>
+                                            <span class="badge text-white {{ $req->status === 'open' ? 'bg-danger' : ($req->status === 'in_progress' ? 'bg-warning' : 'bg-success') }}">{{ $statusMap[$req->status] ?? $req->status }}</span>
                                         </td>
                                         <td>{{ $req->created_at?->diffForHumans() }}</td>
                                         <td>

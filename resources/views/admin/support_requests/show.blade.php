@@ -44,7 +44,7 @@
                         <p class="mb-1"><strong>Cihaz ID:</strong> {{ $supportRequest->device_id ?? '-' }}</p>
                         <p class="mb-1"><strong>Oluşturulma:</strong> {{ $supportRequest->created_at?->format('d.m.Y H:i') }}</p>
                         <p class="mb-1"><strong>Durum:</strong>
-                            <span class="badge {{ $supportRequest->status === 'open' ? 'badge-danger-lighten' : ($supportRequest->status === 'in_progress' ? 'badge-warning-lighten' : 'badge-success-lighten') }}">{{ $supportRequest->status }}</span>
+                            <span class="badge text-white {{ $supportRequest->status === 'open' ? 'bg-danger' : ($supportRequest->status === 'in_progress' ? 'bg-warning' : 'bg-success') }}">{{ $supportRequest->status }}</span>
                         </p>
                     </div>
 

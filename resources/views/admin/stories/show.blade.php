@@ -36,15 +36,15 @@
                                 <th scope="row">Durum</th>
                                 <td>
                                     @if($story->is_active)
-                                        <span class="badge badge-success-lighten">Aktif</span>
+                                        <span class="badge badge bg-success text-white">Aktif</span>
                                     @else
-                                        <span class="badge badge-danger-lighten">Pasif</span>
+                                        <span class="badge badge bg-danger text-white">Pasif</span>
                                     @endif
                                 </td>
                             </tr>
                             <tr>
                                 <th scope="row">Sıralama</th>
-                                <td><span class="badge badge-secondary-lighten">{{ $story->sort_order }}</span></td>
+                                <td><span class="badge badge bg-secondary text-white">{{ $story->sort_order }}</span></td>
                             </tr>
                             <tr>
                                 <th scope="row">Oluşturulma</th>

@@ -356,10 +356,10 @@
                             </span>
                         </div>
                         <div class="mt-2">
-                            <span class="badge {{ $subRegion->is_active ? 'badge-success-lighten' : 'badge-danger-lighten' }} subregion-status-preview">
+                            <span class="badge {{ $subRegion->is_active ? 'badge bg-success text-white' : 'badge bg-danger text-white' }} subregion-status-preview">
                                 {{ $subRegion->is_active ? 'Aktif' : 'Pasif' }}
                             </span>
-                            <span class="badge badge-dark-lighten subregion-order-preview">Sıra: {{ $subRegion->sort_order }}</span>
+                            <span class="badge badge bg-dark text-white subregion-order-preview">Sıra: {{ $subRegion->sort_order }}</span>
                         </div>
                     </div>
                 </div>
@@ -946,10 +946,10 @@
             const statusBadge = document.querySelector('.subregion-status-preview');
             if (isActive) {
                 statusBadge.textContent = 'Aktif';
-                statusBadge.className = 'badge badge-success-lighten subregion-status-preview';
+                statusBadge.className = 'badge badge bg-success text-white subregion-status-preview';
             } else {
                 statusBadge.textContent = 'Pasif';
-                statusBadge.className = 'badge badge-danger-lighten subregion-status-preview';
+                statusBadge.className = 'badge badge bg-danger text-white subregion-status-preview';
             }
         }
 
