@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Model3d;
 use App\Models\ArchaeologicalSite;
+use App\Models\Region;
+use App\Models\SubRegion;
 use Illuminate\Support\Str;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use Illuminate\Http\Request;
@@ -73,10 +75,43 @@ class Model3dController extends Controller
     public function create(Request $request): View
     {
         $locales = config('translatable.locales');
-        $archaeologicalSites = ArchaeologicalSite::with('translations')->active()->get();
+        $regions = Region::with(['translations', 'activeSubRegions.translations'])->active()->ordered()->get();
         $selectedArchaeologicalSiteId = $request->get('archaeological_site_id');
+        $selectedSubRegionId = $request->get('sub_region_id');
+        $selectedRegionId = $request->get('region_id');
 
-        return view('admin.models-3d.create', compact('locales', 'archaeologicalSites', 'selectedArchaeologicalSiteId'));
+        // Prepare region data for JavaScript (hierarchical structure)
+        $regionData = $regions->map(function($region) {
+            $subRegionsArray = $region->activeSubRegions->map(function($sub) {
+                // Get archaeological sites for this sub-region
+                $sites = ArchaeologicalSite::where('sub_region_id', $sub->id)
+                    ->active()
+                    ->with('translations')
+                    ->get()
+                    ->map(function($site) {
+                        $siteName = $site->translate('tr')->name ?? $site->translate('en')->name ?? $site->name ?? 'İsimsiz Ören Yeri';
+                        return [
+                            'id' => $site->id,
+                            'name' => $siteName
+                        ];
+                    })->toArray();
+                
+                $subName = $sub->translate('tr')->name ?? $sub->translate('en')->name ?? $sub->name ?? 'İsimsiz Alt Bölge';
+                return [
+                    'id' => $sub->id,
+                    'name' => $subName,
+                    'archaeologicalSites' => $sites
+                ];
+            })->toArray();
+            
+            return [
+                'id' => $region->id,
+                'color' => $region->color_code,
+                'subRegions' => $subRegionsArray
+            ];
+        })->toArray();
+
+        return view('admin.models-3d.create', compact('locales', 'regions', 'regionData', 'selectedArchaeologicalSiteId', 'selectedSubRegionId', 'selectedRegionId'));
     }
 
     /**
@@ -179,9 +214,40 @@ class Model3dController extends Controller
      */
     public function edit(Request $request, Model3d $model3d): View
     {
-        $model3d->load(['translations', 'archaeologicalSite']);
+        $model3d->load(['translations', 'archaeologicalSite.subRegion.region']);
         $locales = config('translatable.locales');
-        $archaeologicalSites = ArchaeologicalSite::with('translations')->active()->get();
+        $regions = Region::with(['translations', 'activeSubRegions.translations'])->active()->ordered()->get();
+        
+        // Prepare region data for JavaScript (hierarchical structure)
+        $regionData = $regions->map(function($region) {
+            $subRegionsArray = $region->activeSubRegions->map(function($sub) {
+                // Get archaeological sites for this sub-region
+                $sites = ArchaeologicalSite::where('sub_region_id', $sub->id)
+                    ->active()
+                    ->with('translations')
+                    ->get()
+                    ->map(function($site) {
+                        $siteName = $site->translate('tr')->name ?? $site->translate('en')->name ?? $site->name ?? 'İsimsiz Ören Yeri';
+                        return [
+                            'id' => $site->id,
+                            'name' => $siteName
+                        ];
+                    })->toArray();
+                
+                $subName = $sub->translate('tr')->name ?? $sub->translate('en')->name ?? $sub->name ?? 'İsimsiz Alt Bölge';
+                return [
+                    'id' => $sub->id,
+                    'name' => $subName,
+                    'archaeologicalSites' => $sites
+                ];
+            })->toArray();
+            
+            return [
+                'id' => $region->id,
+                'color' => $region->color_code,
+                'subRegions' => $subRegionsArray
+            ];
+        })->toArray();
         
         // Store referer URL for redirect after update
         $referer = $request->header('referer');
@@ -189,7 +255,7 @@ class Model3dController extends Controller
             ? $referer 
             : route('admin.models-3d.index', $request->query());
 
-        return view('admin.models-3d.edit', compact('model3d', 'locales', 'archaeologicalSites', 'returnUrl'));
+        return view('admin.models-3d.edit', compact('model3d', 'locales', 'regions', 'regionData', 'returnUrl'));
     }
 
     /**

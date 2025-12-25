@@ -118,21 +118,46 @@
                 <!-- Ören Yeri Seçimi -->
                 <div class="card">
                     <div class="card-header">
-                        <h4 class="card-title mb-0">Ören Yeri</h4>
+                        <h4 class="card-title mb-0">Ören Yeri Seçimi</h4>
                     </div>
                     <div class="card-body">
+                        <!-- Bölge Seçimi -->
                         <div class="mb-3">
-                            <label class="form-label" for="archaeological_site_id">Ören Yeri <span class="text-danger">*</span></label>
+                            <label class="form-label" for="region_id">Bölge <span class="text-danger">*</span></label>
+                            <select class="form-select" id="region_id">
+                                <option value="">Bölge Seçin</option>
+                                @foreach($regions as $region)
+                                    <option value="{{ $region->id }}" 
+                                            {{ old('region_id', $selectedRegionId ?? '') == $region->id ? 'selected' : '' }}
+                                            data-color="{{ $region->color_code }}">
+                                        {{ $region->name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+                        
+                        <!-- Alt Bölge Seçimi -->
+                        <div class="mb-3">
+                            <label class="form-label" for="sub_region_id">Alt Bölge <span class="text-danger">*</span></label>
+                            <select class="form-select" id="sub_region_id">
+                                <option value="">Önce Bölge Seçin</option>
+                            </select>
+                        </div>
+                        
+                        <!-- Ören Yeri Seçimi -->
+                        <div class="mb-3">
+                            <label class="form-label" for="archaeological_site_id">
+                                Ören Yeri <span class="text-danger">*</span>
+                                <span id="edit-site-link" style="display: none;">
+                                    <a href="#" id="edit-site-btn" class="btn btn-sm btn-outline-primary ms-2" title="Ören Yerini Düzenle" target="_blank">
+                                        <i class="mdi mdi-pencil"></i>
+                                    </a>
+                                </span>
+                            </label>
                             <select class="form-select @error('archaeological_site_id') is-invalid @enderror" 
                                     id="archaeological_site_id" 
                                     name="archaeological_site_id" required>
-                                <option value="">Ören Yeri Seçin</option>
-                                @foreach($archaeologicalSites as $site)
-                                    <option value="{{ $site->id }}" 
-                                            {{ old('archaeological_site_id', $selectedArchaeologicalSiteId) == $site->id ? 'selected' : '' }}>
-                                        {{ $site->name }}
-                                    </option>
-                                @endforeach
+                                <option value="">Önce Alt Bölge Seçin</option>
                             </select>
                             @error('archaeological_site_id')
                                 <div class="invalid-feedback">{{ $message }}</div>
@@ -245,6 +270,120 @@
 @section('scripts')
 <script>
     document.addEventListener('DOMContentLoaded', function() {
+        // Hierarchical dropdown data
+        const regionData = @json($regionData);
+        const regionSelect = document.getElementById('region_id');
+        const subRegionSelect = document.getElementById('sub_region_id');
+        const archaeologicalSiteSelect = document.getElementById('archaeological_site_id');
+        const editSiteLink = document.getElementById('edit-site-link');
+        const editSiteBtn = document.getElementById('edit-site-btn');
+        
+        // Current selected values from query parameters or old input
+        const currentSiteId = {{ old('archaeological_site_id', $selectedArchaeologicalSiteId ?? 0) }};
+        const currentSubRegionId = {{ old('sub_region_id', $selectedSubRegionId ?? 0) }};
+        const currentRegionId = {{ old('region_id', $selectedRegionId ?? 0) }};
+
+        // Update sub-regions when region changes
+        regionSelect.addEventListener('change', function() {
+            const regionId = parseInt(this.value);
+            const selectedRegion = regionData.find(r => r.id === regionId);
+            
+            // Clear sub-region and archaeological site options
+            subRegionSelect.innerHTML = '<option value="">Alt Bölge Seçin</option>';
+            archaeologicalSiteSelect.innerHTML = '<option value="">Ören Yeri Seçin</option>';
+            editSiteLink.style.display = 'none';
+            
+            if (selectedRegion && selectedRegion.subRegions && selectedRegion.subRegions.length > 0) {
+                // Add sub-region options
+                selectedRegion.subRegions.forEach(subRegion => {
+                    const option = document.createElement('option');
+                    option.value = subRegion.id;
+                    option.textContent = subRegion.name;
+                    option.dataset.sites = JSON.stringify(subRegion.archaeologicalSites || []);
+                    
+                    // Select if this is the current sub-region
+                    if (currentSubRegionId == subRegion.id) {
+                        option.selected = true;
+                    }
+                    
+                    subRegionSelect.appendChild(option);
+                });
+                
+                // Trigger sub-region change if we have a selected sub-region
+                if (currentSubRegionId && regionId == currentRegionId) {
+                    subRegionSelect.dispatchEvent(new Event('change'));
+                }
+            } else {
+                const option = document.createElement('option');
+                option.value = '';
+                option.textContent = 'Bu bölgeye ait aktif alt bölge yok';
+                option.disabled = true;
+                subRegionSelect.appendChild(option);
+            }
+        });
+
+        // Update archaeological sites when sub-region changes
+        subRegionSelect.addEventListener('change', function() {
+            const subRegionId = parseInt(this.value);
+            const selectedOption = this.options[this.selectedIndex];
+            const sites = selectedOption.dataset.sites ? JSON.parse(selectedOption.dataset.sites) : [];
+            
+            // Clear archaeological site options
+            archaeologicalSiteSelect.innerHTML = '<option value="">Ören Yeri Seçin</option>';
+            editSiteLink.style.display = 'none';
+            
+            if (sites && sites.length > 0) {
+                // Add archaeological site options
+                sites.forEach(site => {
+                    const option = document.createElement('option');
+                    option.value = site.id;
+                    option.textContent = site.name;
+                    
+                    // Select if this is the current site
+                    if (currentSiteId == site.id) {
+                        option.selected = true;
+                        updateEditLink(site.id);
+                    }
+                    
+                    archaeologicalSiteSelect.appendChild(option);
+                });
+            } else {
+                const option = document.createElement('option');
+                option.value = '';
+                option.textContent = 'Bu alt bölgeye ait aktif ören yeri yok';
+                option.disabled = true;
+                archaeologicalSiteSelect.appendChild(option);
+            }
+        });
+
+        // Update edit link when archaeological site changes
+        archaeologicalSiteSelect.addEventListener('change', function() {
+            const siteId = parseInt(this.value);
+            if (siteId) {
+                updateEditLink(siteId);
+            } else {
+                editSiteLink.style.display = 'none';
+            }
+        });
+
+        // Update edit link function
+        function updateEditLink(siteId) {
+            if (siteId) {
+                // Build edit URL using route pattern
+                const baseUrl = '{{ url("admin/archaeological-sites") }}';
+                editSiteBtn.href = baseUrl + '/' + siteId + '/edit';
+                editSiteLink.style.display = 'inline-block';
+            } else {
+                editSiteLink.style.display = 'none';
+            }
+        }
+
+        // Initialize on page load - trigger region change if we have current values
+        if (currentRegionId) {
+            regionSelect.value = currentRegionId;
+            regionSelect.dispatchEvent(new Event('change'));
+        }
+
         // Sketchfab Model ID validation
         const modelIdInput = document.getElementById('sketchfab_model_id');
         
@@ -275,6 +414,14 @@
                 alert('En az bir dilde model adı girilmelidir.');
                 // Focus on Turkish name field
                 document.getElementById('tr_name').focus();
+                return false;
+            }
+            
+            // Validate hierarchical selection
+            if (!archaeologicalSiteSelect.value) {
+                e.preventDefault();
+                alert('Lütfen bir ören yeri seçin.');
+                archaeologicalSiteSelect.focus();
                 return false;
             }
         });
