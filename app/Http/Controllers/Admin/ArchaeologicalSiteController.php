@@ -215,7 +215,7 @@ class ArchaeologicalSiteController extends Controller
      */
     public function edit(Request $request, ArchaeologicalSite $archaeologicalSite): View
     {
-        $archaeologicalSite->load(['translations', 'subRegion.region']);
+        $archaeologicalSite->load(['translations', 'subRegion.region', 'models3d.translations']);
         $locales = config('translatable.locales');
         $regions = Region::with(['translations', 'activeSubRegions.translations'])->active()->ordered()->get();
         

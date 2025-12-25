@@ -289,6 +289,78 @@
                 </div>
             </div>
 
+            <!-- Bağlı 3D Modeller -->
+            @if($archaeologicalSite->models3d->count() > 0)
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="header-title">
+                        <i class="mdi mdi-cube-outline me-1"></i>
+                        Bağlı 3D Modeller
+                        <span class="badge bg-primary">{{ $archaeologicalSite->models3d->count() }}</span>
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <div class="list-group list-group-flush">
+                        @foreach($archaeologicalSite->models3d as $model)
+                            <div class="list-group-item px-0">
+                                <div class="d-flex align-items-center">
+                                    <div class="flex-shrink-0 me-2">
+                                        @if($model->sketchfab_thumbnail_url)
+                                            <img src="{{ $model->sketchfab_thumbnail_url }}" 
+                                                 alt="{{ $model->name }}" 
+                                                 class="rounded"
+                                                 style="width: 40px; height: 40px; object-fit: cover;">
+                                        @else
+                                            <div class="bg-light rounded d-flex align-items-center justify-content-center" 
+                                                 style="width: 40px; height: 40px;">
+                                                <i class="mdi mdi-cube-outline text-muted"></i>
+                                            </div>
+                                        @endif
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <h6 class="mb-0">{{ $model->name ?: 'İsimsiz Model' }}</h6>
+                                        <small class="text-muted">
+                                            Sıra: {{ $model->sort_order }} | 
+                                            <span class="badge badge-soft-{{ $model->is_active ? 'success' : 'danger' }}">
+                                                {{ $model->is_active ? 'Aktif' : 'Pasif' }}
+                                            </span>
+                                        </small>
+                                    </div>
+                                    <div class="flex-shrink-0">
+                                        <a href="{{ route('admin.models-3d.edit', $model) }}" 
+                                           class="btn btn-sm btn-outline-primary" 
+                                           title="Düzenle">
+                                            <i class="mdi mdi-pencil"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                    <div class="mt-2 text-center">
+                        <a href="{{ route('admin.models-3d.create', ['archaeological_site_id' => $archaeologicalSite->id]) }}" 
+                           class="btn btn-sm btn-outline-success w-100">
+                            <i class="mdi mdi-plus me-1"></i>
+                            Yeni Model Ekle
+                        </a>
+                    </div>
+                </div>
+            </div>
+            @else
+            <div class="card border-dashed">
+                <div class="card-body text-center py-4">
+                    <i class="mdi mdi-cube-outline text-muted" style="font-size: 48px;"></i>
+                    <h5 class="text-muted mt-2">Henüz 3D model eklenmemiş</h5>
+                    <p class="text-muted small mb-3">Bu ören yerine 3D model ekleyerek kullanıcı deneyimini zenginleştirin</p>
+                    <a href="{{ route('admin.models-3d.create', ['archaeological_site_id' => $archaeologicalSite->id]) }}" 
+                       class="btn btn-sm btn-success">
+                        <i class="mdi mdi-plus me-1"></i>
+                        İlk Modeli Ekle
+                    </a>
+                </div>
+            </div>
+            @endif
+
             <!-- Özel Ayarlar -->
             <div class="card">
                 <div class="card-header">
