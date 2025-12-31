@@ -79,9 +79,11 @@ class OnboardingSlideController extends Controller
         $hasAtLeastOne = false;
         $translationRules = [];
         foreach (config('translatable.locales') as $locale) {
-            if ($request->filled("{$locale}.title")) {
-                $hasAtLeastOne = true;
-                $translationRules["{$locale}.title"] = 'required|string|max:255';
+            if ($request->filled("{$locale}.title") || $request->filled("{$locale}.edited_image_data")) {
+                if ($request->filled("{$locale}.title")) {
+                    $hasAtLeastOne = true;
+                    $translationRules["{$locale}.title"] = 'required|string|max:255';
+                }
                 $translationRules["{$locale}.description"] = 'nullable|string';
                 $translationRules["{$locale}.edited_image_data"] = 'nullable|string';
             }
@@ -99,9 +101,20 @@ class OnboardingSlideController extends Controller
         ]);
 
         foreach (config('translatable.locales') as $locale) {
-            if ($request->filled("{$locale}.title")) {
-                $slide->translateOrNew($locale)->title = $request->input("{$locale}.title");
-                $slide->translateOrNew($locale)->description = $request->input("{$locale}.description");
+            // Process if title or image data is provided
+            if ($request->filled("{$locale}.title") || $request->filled("{$locale}.edited_image_data")) {
+                $translation = $slide->translateOrNew($locale);
+                
+                if ($request->filled("{$locale}.title")) {
+                    $translation->title = $request->input("{$locale}.title");
+                } else {
+                    // Title is required in database, set empty string if not provided
+                    $translation->title = '';
+                }
+                
+                if ($request->filled("{$locale}.description")) {
+                    $translation->description = $request->input("{$locale}.description");
+                }
                 
                 // Handle canvas image for each locale
                 if ($request->filled("{$locale}.edited_image_data")) {
@@ -111,7 +124,7 @@ class OnboardingSlideController extends Controller
                     // Save edited canvas as image
                     $imagePath = $this->saveCanvasAsImage($request->input("{$locale}.edited_image_data"));
                     \Log::info('Onboarding Create - Canvas saved to: ' . $imagePath);
-                    $slide->translateOrNew($locale)->image = $imagePath;
+                    $translation->image = $imagePath;
                 }
             }
         }
@@ -178,9 +191,11 @@ class OnboardingSlideController extends Controller
         $hasAtLeastOne = false;
         $translationRules = [];
         foreach (config('translatable.locales') as $locale) {
-            if ($request->filled("{$locale}.title")) {
-                $hasAtLeastOne = true;
-                $translationRules["{$locale}.title"] = 'required|string|max:255';
+            if ($request->filled("{$locale}.title") || $request->filled("{$locale}.edited_image_data")) {
+                if ($request->filled("{$locale}.title")) {
+                    $hasAtLeastOne = true;
+                    $translationRules["{$locale}.title"] = 'required|string|max:255';
+                }
                 $translationRules["{$locale}.description"] = 'nullable|string';
                 $translationRules["{$locale}.edited_image_data"] = 'nullable|string';
             }
@@ -197,9 +212,24 @@ class OnboardingSlideController extends Controller
         $onboardingSlide->save();
 
         foreach (config('translatable.locales') as $locale) {
-            if ($request->filled("{$locale}.title")) {
-                $onboardingSlide->translateOrNew($locale)->title = $request->input("{$locale}.title");
-                $onboardingSlide->translateOrNew($locale)->description = $request->input("{$locale}.description");
+            // Process if title or image data is provided
+            if ($request->filled("{$locale}.title") || $request->filled("{$locale}.edited_image_data")) {
+                $existingTranslation = $onboardingSlide->translate($locale, false);
+                $isNewTranslation = !$existingTranslation;
+                
+                $translation = $onboardingSlide->translateOrNew($locale);
+                
+                if ($request->filled("{$locale}.title")) {
+                    $translation->title = $request->input("{$locale}.title");
+                } elseif ($isNewTranslation) {
+                    // Title is required in database, set empty string if not provided for new translation
+                    $translation->title = '';
+                }
+                // If existing translation and no title provided, keep existing title (don't overwrite)
+                
+                if ($request->filled("{$locale}.description")) {
+                    $translation->description = $request->input("{$locale}.description");
+                }
                 
                 // Handle canvas image for each locale
                 if ($request->filled("{$locale}.edited_image_data")) {
@@ -208,15 +238,14 @@ class OnboardingSlideController extends Controller
                     \Log::info('Onboarding Update - Canvas data length: ' . $dataLength);
                     
                     // Delete old image for this locale if exists
-                    $translation = $onboardingSlide->getTranslation($locale, false);
-                    if ($translation && $translation->image) {
-                        Storage::disk('public')->delete($translation->image);
+                    if ($existingTranslation && $existingTranslation->image) {
+                        Storage::disk('public')->delete($existingTranslation->image);
                     }
                     
                     // Save edited canvas as image
                     $imagePath = $this->saveCanvasAsImage($request->input("{$locale}.edited_image_data"));
                     \Log::info('Onboarding Update - Canvas saved to: ' . $imagePath);
-                    $onboardingSlide->translateOrNew($locale)->image = $imagePath;
+                    $translation->image = $imagePath;
                 }
             }
         }
@@ -234,7 +263,7 @@ class OnboardingSlideController extends Controller
     {
         // Delete all translation images
         foreach (config('translatable.locales') as $locale) {
-            $translation = $onboardingSlide->getTranslation($locale, false);
+            $translation = $onboardingSlide->translate($locale, false);
             if ($translation && $translation->image) {
                 Storage::disk('public')->delete($translation->image);
             }

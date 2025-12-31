@@ -54,17 +54,17 @@
                                 <div class="tab-pane @if($locale==='tr') active @endif" id="{{ $locale }}" role="tabpanel">
                                     <div class="mb-3">
                                         <label class="form-label" for="{{ $locale }}_title">Başlık @if($locale==='tr')<span class="text-danger">*</span>@endif</label>
-                                        <input type="text" class="form-control @error($locale.'.title') is-invalid @enderror" id="{{ $locale }}_title" name="{{ $locale }}[title]" value="{{ old($locale.'.title', $onboardingSlide->getTranslation('title', $locale)) }}">
+                                        <input type="text" class="form-control @error($locale.'.title') is-invalid @enderror" id="{{ $locale }}_title" name="{{ $locale }}[title]" value="{{ old($locale.'.title', $onboardingSlide->translate($locale, false)->title ?? '') }}">
                                         @error($locale.'.title')<div class="invalid-feedback">{{ $message }}</div>@enderror
                                     </div>
                                     <div class="mb-3">
                                         <label class="form-label" for="{{ $locale }}_description">Açıklama</label>
-                                        <textarea class="form-control @error($locale.'.description') is-invalid @enderror" id="{{ $locale }}_description" name="{{ $locale }}[description]" rows="4">{{ old($locale.'.description', $onboardingSlide->getTranslation('description', $locale)) }}</textarea>
+                                        <textarea class="form-control @error($locale.'.description') is-invalid @enderror" id="{{ $locale }}_description" name="{{ $locale }}[description]" rows="4">{{ old($locale.'.description', $onboardingSlide->translate($locale, false)->description ?? '') }}</textarea>
                                         @error($locale.'.description')<div class="invalid-feedback">{{ $message }}</div>@enderror
                                     </div>
                                     
                                     @php
-                                        $translation = $onboardingSlide->getTranslation($locale, false);
+                                        $translation = $onboardingSlide->translate($locale, false);
                                         $imageUrl = $translation && $translation->image ? $translation->image : null;
                                     @endphp
                                     @if($imageUrl)
@@ -282,29 +282,28 @@ function saveCanvasData() {
         return true; // Let form submit anyway
     }
     
-    if (!backgroundImage) {
-        console.log('Background image yok!');
-        return false; // Prevent form submission
-    }
-    
     try {
         // Save current language canvas state first
-        saveCurrentLanguageCanvas();
+        if (typeof window.saveCurrentLanguageCanvas === 'function') {
+            window.saveCurrentLanguageCanvas();
+        }
         
         // Populate all language hidden inputs
-        Object.keys(languageCanvasData).forEach(locale => {
-            const hiddenInput = document.getElementById(`editedImageData_${locale}`);
-            if (hiddenInput && languageCanvasData[locale]) {
-                hiddenInput.value = languageCanvasData[locale];
-                console.log(`${locale} dili için canvas data kaydedildi:`, languageCanvasData[locale].length);
-            }
-        });
+        if (typeof window.languageCanvasData !== 'undefined' && window.languageCanvasData) {
+            Object.keys(window.languageCanvasData).forEach(locale => {
+                const hiddenInput = document.getElementById(`editedImageData_${locale}`);
+                if (hiddenInput && window.languageCanvasData[locale]) {
+                    hiddenInput.value = window.languageCanvasData[locale];
+                    console.log(`${locale} dili için canvas data kaydedildi:`, window.languageCanvasData[locale].length);
+                }
+            });
+        }
         
         console.log('Tüm diller için canvas data kaydedildi! Form gönderiliyor...');
         return true; // Allow form submission
     } catch (error) {
         console.error('Canvas kaydetme hatası:', error);
-        return false; // Prevent form submission
+        return true; // Allow form submission even if there's an error
     }
 }
 
@@ -328,6 +327,9 @@ document.addEventListener('DOMContentLoaded', function() {
     let currentEditingLanguage = 'tr';
     let languageCanvasData = {};
     let languageBackgroundImages = {};
+    
+    // Make languageCanvasData globally accessible
+    window.languageCanvasData = languageCanvasData;
     
     let currentTool = 'select';
     let history = [];
@@ -444,7 +446,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // Save current language canvas state
-    function saveCurrentLanguageCanvas() {
+    window.saveCurrentLanguageCanvas = function() {
         if (!canvas || !backgroundImage) return;
         
         try {
@@ -455,11 +457,15 @@ document.addEventListener('DOMContentLoaded', function() {
             });
             
             languageCanvasData[currentEditingLanguage] = dataURL;
+            // Also update global reference
+            if (window.languageCanvasData) {
+                window.languageCanvasData[currentEditingLanguage] = dataURL;
+            }
             console.log(`${currentEditingLanguage} dili için canvas state kaydedildi:`, dataURL.length);
         } catch (error) {
             console.error('Canvas state kaydetme hatası:', error);
         }
-    }
+    };
 
     // Load language canvas state
     function loadLanguageCanvas() {
@@ -467,12 +473,42 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Clear canvas
         canvas.clear();
+        canvas.backgroundColor = '#ffffff';
         backgroundImage = null;
         window.fabricBackgroundImage = null;
         
-        // Load background image for current language
-        if (languageBackgroundImages[currentEditingLanguage]) {
-            console.log(`${currentEditingLanguage} için background image bulundu`);
+        // Load saved canvas data (base64 image) if exists
+        if (languageCanvasData[currentEditingLanguage]) {
+            console.log(`${currentEditingLanguage} için canvas data bulundu`);
+            const img = new Image();
+            img.onload = function() {
+                const fabricImage = new fabric.Image(img);
+                const scale = Math.min(canvas.width / img.width, canvas.height / img.height);
+                
+                fabricImage.set({
+                    left: (canvas.width - img.width * scale) / 2,
+                    top: (canvas.height - img.height * scale) / 2,
+                    scaleX: scale,
+                    scaleY: scale,
+                    selectable: false,
+                    evented: false
+                });
+                
+                backgroundImage = fabricImage;
+                window.fabricBackgroundImage = backgroundImage;
+                canvas.add(backgroundImage);
+                canvas.sendToBack(backgroundImage);
+                canvas.renderAll();
+                
+                console.log(`${currentEditingLanguage} dili için canvas data yüklendi`);
+            };
+            img.onerror = function() {
+                console.error(`${currentEditingLanguage} için canvas data yüklenemedi`);
+            };
+            img.src = languageCanvasData[currentEditingLanguage];
+        } else if (languageBackgroundImages[currentEditingLanguage]) {
+            // Fallback to preloaded background image for this language
+            console.log(`${currentEditingLanguage} için background image bulundu (fallback)`);
             fabric.Image.fromURL(languageBackgroundImages[currentEditingLanguage], function(img) {
                 const scale = Math.min(canvas.width / img.width, canvas.height / img.height);
                 
@@ -492,32 +528,21 @@ document.addEventListener('DOMContentLoaded', function() {
                 canvas.renderAll();
                 
                 console.log(`${currentEditingLanguage} için background image canvas'a eklendi`);
+            }, {
+                crossOrigin: 'anonymous'
             });
         } else {
-            console.log(`${currentEditingLanguage} için background image bulunamadı`);
+            console.log(`${currentEditingLanguage} için hiçbir görsel bulunamadı`);
         }
         
-        // Load canvas objects for current language
-        if (languageCanvasData[currentEditingLanguage]) {
-            console.log(`${currentEditingLanguage} için canvas data bulundu`);
-            try {
-                canvas.loadFromJSON(languageCanvasData[currentEditingLanguage], function() {
-                    canvas.renderAll();
-                    console.log(`${currentEditingLanguage} dili için canvas data yüklendi`);
-                });
-            } catch (error) {
-                console.error('Canvas data yükleme hatası:', error);
-            }
-        } else {
-            console.log(`${currentEditingLanguage} için canvas data bulunamadı`);
-        }
+        canvas.renderAll();
     }
 
     // Load existing images for all languages
     @php
         $existingImages = [];
         foreach(config('translatable.locales') as $locale) {
-            $translation = $onboardingSlide->getTranslation($locale, false);
+            $translation = $onboardingSlide->translate($locale, false);
             if ($translation && $translation->image) {
                 $existingImages[$locale] = asset('storage/' . $translation->image);
             }
@@ -531,14 +556,16 @@ document.addEventListener('DOMContentLoaded', function() {
         const totalImagesToLoad = Object.keys(existingImages).length;
         
         Object.keys(existingImages).forEach(locale => {
+            const imageUrl = existingImages[locale];
+            // Store URL immediately, even if image fails to load
+            languageBackgroundImages[locale] = imageUrl;
+            
             const img = new Image();
             img.crossOrigin = 'anonymous';
             img.onload = function() {
-                // Store this image for the language
-                languageBackgroundImages[locale] = img.src;
                 loadedImagesCount++;
                 
-                console.log(`${locale} dili için görsel yüklendi:`, img.src.substring(0, 50) + '...');
+                console.log(`${locale} dili için görsel yüklendi:`, imageUrl.substring(0, 50) + '...');
                 
                 // If this is the current editing language, show it on canvas
                 if (locale === currentEditingLanguage) {
@@ -571,10 +598,15 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             };
             img.onerror = function() {
-                console.error(`${locale} dili için görsel yüklenemedi:`, existingImages[locale]);
+                console.error(`${locale} dili için görsel yüklenemedi:`, imageUrl);
                 loadedImagesCount++;
+                
+                // If all images processed (even with errors), log completion
+                if (loadedImagesCount === totalImagesToLoad) {
+                    console.log('Tüm diller için görseller işlendi (bazıları hata verdi):', languageBackgroundImages);
+                }
             };
-            img.src = existingImages[locale];
+            img.src = imageUrl;
         });
     @else
         console.log('Hiçbir dil için mevcut görsel bulunamadı.');

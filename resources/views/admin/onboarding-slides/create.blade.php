@@ -324,20 +324,22 @@ function saveCanvasData() {
     console.log('saveCanvasData global function çağrıldı!');
     
     // Save current language canvas first
-    if (typeof saveCurrentLanguageCanvas === 'function') {
-        saveCurrentLanguageCanvas();
+    if (typeof window.saveCurrentLanguageCanvas === 'function') {
+        window.saveCurrentLanguageCanvas();
     }
     
     // Save all language canvas data to hidden inputs
     let hasAtLeastOneCanvas = false;
     
     const locales = @json(config('translatable.locales'));
+    const canvasData = window.languageCanvasData || {};
+    
     for (let locale of locales) {
         const hiddenInput = document.getElementById('editedImageData_' + locale);
-        if (hiddenInput && languageCanvasData[locale]) {
-            hiddenInput.value = languageCanvasData[locale];
+        if (hiddenInput && canvasData[locale]) {
+            hiddenInput.value = canvasData[locale];
             hasAtLeastOneCanvas = true;
-            console.log('Canvas kaydedildi, dil:', locale, 'boyut:', languageCanvasData[locale].length);
+            console.log('Canvas kaydedildi, dil:', locale, 'boyut:', canvasData[locale].length);
         }
     }
     
@@ -355,6 +357,13 @@ function saveCanvasData() {
         
         if (!hasTitle) {
             alert('En az bir dilde başlık girmelisiniz!');
+            return false;
+        }
+        
+        // Warn user that no image was uploaded
+        if (confirm('Hiçbir dil için görsel yüklenmedi. Devam etmek istiyor musunuz?')) {
+            return true;
+        } else {
             return false;
         }
     }
@@ -434,6 +443,9 @@ document.addEventListener('DOMContentLoaded', function() {
     let languageCanvasData = {}; // Store canvas data for each language
     let languageBackgroundImages = {}; // Store background images for each language
     
+    // Make languageCanvasData globally accessible
+    window.languageCanvasData = languageCanvasData;
+    
     // Language selector change handler
     document.getElementById('editingLanguage').addEventListener('change', function() {
         saveCurrentLanguageCanvas();
@@ -490,21 +502,25 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     
     // Save current language canvas data
-    function saveCurrentLanguageCanvas() {
-        if (backgroundImage) {
-            try {
-                const dataURL = canvas.toDataURL({
-                    format: 'png',
-                    quality: 1,
-                    multiplier: 2
-                });
-                languageCanvasData[currentEditingLanguage] = dataURL;
-                console.log('Canvas kaydedildi, dil:', currentEditingLanguage, 'boyut:', dataURL.length);
-            } catch (error) {
-                console.error('Canvas kaydetme hatası:', error);
+    window.saveCurrentLanguageCanvas = function() {
+        if (!canvas || !backgroundImage) return;
+        
+        try {
+            const dataURL = canvas.toDataURL({
+                format: 'png',
+                quality: 1,
+                multiplier: 2
+            });
+            languageCanvasData[currentEditingLanguage] = dataURL;
+            // Also update global reference
+            if (window.languageCanvasData) {
+                window.languageCanvasData[currentEditingLanguage] = dataURL;
             }
+            console.log('Canvas kaydedildi, dil:', currentEditingLanguage, 'boyut:', dataURL.length);
+        } catch (error) {
+            console.error('Canvas kaydetme hatası:', error);
         }
-    }
+    };
     
     // Load language canvas data
     function loadLanguageCanvas() {
@@ -684,82 +700,6 @@ document.addEventListener('DOMContentLoaded', function() {
         if (history.length > 20) {
             history.shift();
             historyIndex--;
-        }
-    }
-
-    // Test if form exists
-    const form = document.querySelector('form');
-    console.log('Form element bulundu:', form);
-    
-    // Add multiple event listeners to catch form submission
-    if (form) {
-        // Method 1: Standard submit event
-        form.addEventListener('submit', function(e) {
-            console.log('Method 1: Form submit event tetiklendi!');
-            handleFormSubmit(e);
-        });
-        
-        // Method 2: Submit button click
-        const submitBtn = form.querySelector('button[type="submit"]');
-        if (submitBtn) {
-            console.log('Submit button bulundu:', submitBtn);
-            submitBtn.addEventListener('click', function(e) {
-                console.log('Method 2: Submit button tıklandı!');
-                // Don't prevent here, let form submit naturally
-            });
-        }
-        
-        // Method 3: Form onsubmit
-        form.onsubmit = function(e) {
-            console.log('Method 3: Form onsubmit tetiklendi!');
-            return handleFormSubmit(e);
-        };
-    }
-    
-    function handleFormSubmit(e) {
-        console.log('handleFormSubmit çağrıldı!');
-        alert('Form submit ediliyor! Canvas kaydediliyor...');
-        
-        // Check if there's a background image
-        if (!backgroundImage) {
-            console.log('Background image yok!');
-            e.preventDefault();
-            alert('Lütfen önce bir arkaplan görseli yükleyin!');
-            return false;
-        }
-
-        console.log('Background image var, canvas kaydediliyor...');
-        
-        try {
-            // Convert canvas to data URL with high quality
-            const dataURL = canvas.toDataURL({
-                format: 'png',
-                quality: 1,
-                multiplier: 2 // Higher resolution
-            });
-            
-            console.log('Canvas data URL uzunluğu:', dataURL.length);
-            console.log('Canvas data URL başlangıcı:', dataURL.substring(0, 50));
-            
-            // Set the data URL to hidden input
-            const hiddenInput = document.getElementById('editedImageData');
-            hiddenInput.value = dataURL;
-            
-            // Verify the value was set
-            console.log('Hidden input value uzunluğu:', hiddenInput.value.length);
-            console.log('Hidden input value başlangıcı:', hiddenInput.value.substring(0, 50));
-            
-            // Show success message
-            console.log('Canvas içeriği başarıyla kaydedildi!');
-            alert('Canvas başarıyla kaydedildi! Form gönderiliyor...');
-            
-            // Don't prevent form submission - let it continue
-            return true;
-        } catch (error) {
-            console.error('Canvas kaydetme hatası:', error);
-            e.preventDefault();
-            alert('Canvas kaydedilirken hata oluştu: ' + error.message);
-            return false;
         }
     }
 
