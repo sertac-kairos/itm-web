@@ -257,6 +257,10 @@
                                     <input class="form-check-input" type="checkbox" id="memory_izmir_active" name="memory_izmir_active" value="1" {{ old('memory_izmir_active', $settings['memory_izmir_active']) ? 'checked' : '' }}>
                                     <label class="form-check-label" for="memory_izmir_active">Hafıza İzmir Aktif</label>
                                 </div>
+                                <div class="form-check form-switch mb-3">
+                                    <input class="form-check-input" type="checkbox" id="model_ar_experience_active" name="model_ar_experience_active" value="1" {{ old('model_ar_experience_active', $settings['model_ar_experience_active']) ? 'checked' : '' }}>
+                                    <label class="form-check-label" for="model_ar_experience_active">Model AR Deneyimi</label>
+                                </div>
                             </div>
                         </div>
                         <div class="row">
@@ -293,6 +297,7 @@
                                     @error('model_title_color')<div class="invalid-feedback">{{ $message }}</div>@enderror
                                     <small class="text-muted">Model başlığı rengini seçin (Hex formatında)</small>
                                 </div>
+
                             </div>
                         </div>
                     </div>

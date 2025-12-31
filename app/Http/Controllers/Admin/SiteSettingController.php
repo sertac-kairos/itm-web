@@ -36,6 +36,7 @@ class SiteSettingController extends Controller
             'model_background_color' => AppSetting::get('model_background_color', '#ffffff'),
             'model_title_color' => AppSetting::get('model_title_color', '#000000'),
             'time_travel_hotspot_image_visible' => (bool) AppSetting::get('time_travel_hotspot_image_visible', true),
+            'model_ar_experience_active' => (bool) AppSetting::get('model_ar_experience_active', true),
         ];
 
         $aboutProject = [];
@@ -50,13 +51,13 @@ class SiteSettingController extends Controller
 
         // Get all active regions for time travel slider selection
         $regions = Region::with('translations')->active()->ordered()->get();
-        
+
         // Get selected region IDs for time travel slider
         $selectedRegionIds = [];
         $timeTravelSliderRegions = AppSetting::get('time_travel_slider_regions');
         if ($timeTravelSliderRegions) {
             $selectedRegionIds = explode('|', $timeTravelSliderRegions);
-            $selectedRegionIds = array_filter($selectedRegionIds, function($id) {
+            $selectedRegionIds = array_filter($selectedRegionIds, function ($id) {
                 return !empty($id) && is_numeric($id);
             });
             $selectedRegionIds = array_map('intval', $selectedRegionIds);
@@ -89,6 +90,7 @@ class SiteSettingController extends Controller
             'model_background_color' => 'nullable|string|regex:/^#[0-9A-Fa-f]{6}$/',
             'model_title_color' => 'nullable|string|regex:/^#[0-9A-Fa-f]{6}$/',
             'time_travel_hotspot_image_visible' => 'nullable|boolean',
+            'model_ar_experience_active' => 'nullable|boolean',
             'time_travel_slider_regions' => 'nullable|array',
             'time_travel_slider_regions.*' => 'nullable|integer|exists:regions,id',
         ];
@@ -129,18 +131,18 @@ class SiteSettingController extends Controller
 
         // Save new parameters with English names
         AppSetting::set('time_travel_slider_active', $request->boolean('time_travel_slider_active'));
-        
+
         // Save time travel slider regions (IDs separated by |)
         $regionIds = $request->input('time_travel_slider_regions', []);
         if (is_array($regionIds) && !empty($regionIds)) {
-            $regionIds = array_filter($regionIds, function($id) {
+            $regionIds = array_filter($regionIds, function ($id) {
                 return !empty($id) && is_numeric($id);
             });
             AppSetting::set('time_travel_slider_regions', implode('|', $regionIds));
         } else {
             AppSetting::set('time_travel_slider_regions', null);
         }
-        
+
         AppSetting::set('stories_active', $request->boolean('stories_active'));
         AppSetting::set('nearby_archaeological_sites_active', $request->boolean('nearby_archaeological_sites_active'));
         AppSetting::set('nearby_archaeological_sites_count', $validated['nearby_archaeological_sites_count'] ?? 10);
@@ -149,6 +151,7 @@ class SiteSettingController extends Controller
         AppSetting::set('model_background_color', $validated['model_background_color'] ?? '#ffffff');
         AppSetting::set('model_title_color', $validated['model_title_color'] ?? '#000000');
         AppSetting::set('time_travel_hotspot_image_visible', $request->boolean('time_travel_hotspot_image_visible'));
+        AppSetting::set('model_ar_experience_active', $request->boolean('model_ar_experience_active'));
 
         foreach ($locales as $locale) {
             AppSetting::set("about_project.$locale", data_get($validated, "about_project.$locale"));
