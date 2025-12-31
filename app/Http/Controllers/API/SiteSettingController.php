@@ -17,7 +17,7 @@ class SiteSettingController extends Controller
     {
         // Get locale from request header or default to app locale
         $locale = app()->getLocale();
-        
+
         // Set application locale for this request
 
         // Get all settings
@@ -38,6 +38,7 @@ class SiteSettingController extends Controller
             'model_background_color' => AppSetting::get('model_background_color', '#ffffff'),
             'model_title_color' => AppSetting::get('model_title_color', '#000000'),
             'time_travel_hotspot_image_visible' => (bool) AppSetting::get('time_travel_hotspot_image_visible', true),
+            'model_ar_experience_active' => (bool) AppSetting::get('model_ar_experience_active', true),
         ];
 
         // Get timeline images JSON
@@ -101,7 +102,7 @@ class SiteSettingController extends Controller
         }
 
         $regionIds = explode('|', $regionsString);
-        return array_filter(array_map('intval', $regionIds), function($id) {
+        return array_filter(array_map('intval', $regionIds), function ($id) {
             return $id > 0;
         });
     }
