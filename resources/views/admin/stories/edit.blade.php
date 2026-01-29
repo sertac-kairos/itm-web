@@ -100,6 +100,26 @@
                                             <label class="form-label">Bu dil için düzenlenen görsel</label>
                                             <div class="form-text">Aşağıdaki editörde kaydedildiğinde otomatik eklenecek.</div>
                                             <input type="hidden" id="editedImageData_{{ $locale }}" name="{{ $locale }}[edited_image_data]">
+                                            
+                                            @php
+                                                $translation = $story->translate($locale, false);
+                                                $existingImage = $translation && $translation->image ? asset('storage/' . $translation->image) : null;
+                                            @endphp
+                                            
+                                            @if($existingImage)
+                                                <div class="mt-2">
+                                                    <label class="form-label">Mevcut Görsel:</label>
+                                                    <div>
+                                                        <img src="{{ $existingImage }}" 
+                                                             alt="{{ strtoupper($locale) }} mevcut görsel" 
+                                                             class="img-thumbnail" 
+                                                             style="max-width: 200px; max-height: 300px; cursor: pointer;"
+                                                             onclick="loadExistingImageToCanvas('{{ $locale }}', '{{ $existingImage }}')"
+                                                             title="Görseli editöre yüklemek için tıklayın">
+                                                    </div>
+                                                    <small class="text-muted">Görseli editöre yüklemek için tıklayın</small>
+                                                </div>
+                                            @endif
                                         </div>
                                     </div>
                                 </div>
@@ -465,34 +485,6 @@ document.addEventListener('DOMContentLoaded', function(){
         document.head.appendChild(link);
     });
 
-    // Load existing edited images if available
-    @if($story->edited_images)
-        const existingImages = @json($story->edited_images);
-        Object.keys(existingImages).forEach(locale => {
-            const img = new Image();
-            img.onload = function() {
-                const fabricImage = new fabric.Image(img);
-                const scale = Math.min(canvas.width/img.width, canvas.height/img.height);
-                fabricImage.set({
-                    left: (canvas.width - img.width*scale)/2,
-                    top: (canvas.height - img.height*scale)/2,
-                    scaleX: scale,
-                    scaleY: scale,
-                    selectable: false,
-                    evented: false
-                });
-                backgroundImage = fabricImage;
-                window.fabricBackgroundImage = backgroundImage;
-                languageBackgroundImages[locale] = existingImages[locale];
-                canvas.add(backgroundImage);
-                canvas.sendToBack(backgroundImage);
-                canvas.renderAll();
-                window.saveCurrentLanguageCanvas();
-            };
-            img.src = existingImages[locale];
-        });
-    @endif
-    
     const canvas = new fabric.Canvas('fabricCanvas', { width: 400, height: 600, backgroundColor: '#ffffff', selection: true, preserveObjectStacking: true });
     let backgroundImage = null;
     window.fabricCanvas = canvas;
@@ -507,6 +499,64 @@ document.addEventListener('DOMContentLoaded', function(){
     let currentEditingLanguage = 'tr';
     const languageCanvasData = {};
     const languageBackgroundImages = {};
+    
+    // Load existing edited images if available - after canvas is initialized
+    @if($story->edited_images && count($story->edited_images) > 0)
+        const existingImages = @json($story->edited_images);
+        let loadedImagesCount = 0;
+        const totalImages = Object.keys(existingImages).length;
+        
+        Object.keys(existingImages).forEach(locale => {
+            const imageUrl = existingImages[locale];
+            // Store the image URL for this language
+            languageBackgroundImages[locale] = imageUrl;
+            // Load the full canvas data (the edited image) as base64
+            const img = new Image();
+            img.crossOrigin = 'anonymous';
+            img.onload = function() {
+                // Convert the image to base64 data URL and store it
+                const tempCanvas = document.createElement('canvas');
+                tempCanvas.width = img.width;
+                tempCanvas.height = img.height;
+                const tempCtx = tempCanvas.getContext('2d');
+                tempCtx.drawImage(img, 0, 0);
+                try {
+                    const dataURL = tempCanvas.toDataURL('image/png');
+                    languageCanvasData[locale] = dataURL;
+                    // Also store in hidden input
+                    const hidden = document.getElementById('editedImageData_' + locale);
+                    if (hidden) {
+                        hidden.value = dataURL;
+                    }
+                } catch(e) {
+                    console.error('Error converting image to base64:', e);
+                }
+                
+                loadedImagesCount++;
+                // Load the current language canvas after all images are loaded
+                if (loadedImagesCount === totalImages) {
+                    setTimeout(function() {
+                        loadLanguageCanvas();
+                    }, 100);
+                }
+            };
+            img.onerror = function() {
+                console.error('Error loading image for locale:', locale, imageUrl);
+                loadedImagesCount++;
+                if (loadedImagesCount === totalImages) {
+                    setTimeout(function() {
+                        loadLanguageCanvas();
+                    }, 100);
+                }
+            };
+            img.src = imageUrl;
+        });
+    @else
+        // No existing images, load empty canvas
+        setTimeout(function() {
+            loadLanguageCanvas();
+        }, 100);
+    @endif
 
     document.getElementById('editingLanguage').addEventListener('change', function(){ saveCurrentLanguageCanvas(); currentEditingLanguage=this.value; loadLanguageCanvas(); });
     document.getElementById('currentLanguageImage').addEventListener('change', function(){ 
@@ -542,14 +592,27 @@ document.addEventListener('DOMContentLoaded', function(){
         img.src=URL.createObjectURL(file); 
     });
 
-    window.saveCurrentLanguageCanvas = function(){ if(backgroundImage){ try { const dataURL = canvas.toDataURL({ format:'png', quality:1, multiplier:2 }); languageCanvasData[currentEditingLanguage]=dataURL; const hidden=document.getElementById('editedImageData_'+currentEditingLanguage); if(hidden){ hidden.value=dataURL; } } catch(e){} } };
+    window.saveCurrentLanguageCanvas = function(){ 
+        try { 
+            const dataURL = canvas.toDataURL({ format:'png', quality:1, multiplier:2 }); 
+            languageCanvasData[currentEditingLanguage]=dataURL; 
+            const hidden=document.getElementById('editedImageData_'+currentEditingLanguage); 
+            if(hidden){ hidden.value=dataURL; } 
+        } catch(e){
+            console.error('Error saving canvas:', e);
+        } 
+    };
+    
     function loadLanguageCanvas(){
         canvas.clear();
         canvas.backgroundColor='#ffffff';
-        backgroundImage=null; window.fabricBackgroundImage=null;
+        backgroundImage=null; 
+        window.fabricBackgroundImage=null;
+        
         if(languageCanvasData[currentEditingLanguage]){
-            // Load saved canvas data (base64 image)
+            // Load saved canvas data (base64 image - the full edited image)
             const img = new Image(); 
+            img.crossOrigin = 'anonymous';
             img.onload = function(){ 
                 const fabricImage = new fabric.Image(img); 
                 const scale = Math.min(canvas.width/img.width, canvas.height/img.height); 
@@ -567,17 +630,100 @@ document.addEventListener('DOMContentLoaded', function(){
                 canvas.sendToBack(backgroundImage); 
                 canvas.renderAll(); 
             }; 
+            img.onerror = function() {
+                console.error('Error loading canvas data for locale:', currentEditingLanguage);
+            };
             img.src = languageCanvasData[currentEditingLanguage];
         } else if (languageBackgroundImages[currentEditingLanguage]) {
             // fallback to preloaded background image for this language
             fabric.Image.fromURL(languageBackgroundImages[currentEditingLanguage], function(img){
+                if (!img) {
+                    console.error('Failed to load image from URL:', languageBackgroundImages[currentEditingLanguage]);
+                    return;
+                }
                 const scale=Math.min(canvas.width/img.width, canvas.height/img.height);
-                img.set({ left:(canvas.width - img.width*scale)/2, top:(canvas.height - img.height*scale)/2, scaleX:scale, scaleY:scale, selectable:false, evented:false });
-                backgroundImage=img; window.fabricBackgroundImage=backgroundImage; canvas.add(backgroundImage); canvas.sendToBack(backgroundImage); canvas.renderAll();
-            });
+                img.set({ 
+                    left:(canvas.width - img.width*scale)/2, 
+                    top:(canvas.height - img.height*scale)/2, 
+                    scaleX:scale, 
+                    scaleY:scale, 
+                    selectable:false, 
+                    evented:false 
+                });
+                backgroundImage=img; 
+                window.fabricBackgroundImage=backgroundImage; 
+                canvas.add(backgroundImage); 
+                canvas.sendToBack(backgroundImage); 
+                canvas.renderAll();
+            }, { crossOrigin: 'anonymous' });
         }
         canvas.renderAll();
     }
+    
+    // Function to load existing image to canvas
+    window.loadExistingImageToCanvas = function(locale, imageUrl) {
+        // Switch to the correct language if needed
+        if (currentEditingLanguage !== locale) {
+            saveCurrentLanguageCanvas();
+            currentEditingLanguage = locale;
+            document.getElementById('editingLanguage').value = locale;
+        }
+        
+        // Load the image
+        const img = new Image();
+        img.crossOrigin = 'anonymous';
+        img.onload = function() {
+            // Clear canvas first
+            canvas.clear();
+            canvas.backgroundColor = '#ffffff';
+            
+            if (backgroundImage) {
+                canvas.remove(backgroundImage);
+            }
+            
+            const fabricImage = new fabric.Image(img);
+            const scale = Math.min(canvas.width/img.width, canvas.height/img.height);
+            fabricImage.set({
+                left: (canvas.width - img.width*scale)/2,
+                top: (canvas.height - img.height*scale)/2,
+                scaleX: scale,
+                scaleY: scale,
+                selectable: false,
+                evented: false
+            });
+            
+            backgroundImage = fabricImage;
+            window.fabricBackgroundImage = backgroundImage;
+            languageBackgroundImages[locale] = imageUrl;
+            
+            // Convert to base64 and store
+            const tempCanvas = document.createElement('canvas');
+            tempCanvas.width = img.width;
+            tempCanvas.height = img.height;
+            const tempCtx = tempCanvas.getContext('2d');
+            tempCtx.drawImage(img, 0, 0);
+            try {
+                const dataURL = tempCanvas.toDataURL('image/png');
+                languageCanvasData[locale] = dataURL;
+                const hidden = document.getElementById('editedImageData_' + locale);
+                if (hidden) {
+                    hidden.value = dataURL;
+                }
+            } catch(e) {
+                console.error('Error converting image to base64:', e);
+            }
+            
+            canvas.add(backgroundImage);
+            canvas.sendToBack(backgroundImage);
+            canvas.renderAll();
+            
+            alert('Görsel editöre yüklendi. Düzenleyebilirsiniz.');
+        };
+        img.onerror = function() {
+            alert('Görsel yüklenirken hata oluştu.');
+        };
+        img.src = imageUrl;
+    };
 
     document.getElementById('saveToLanguage').addEventListener('click', function(){ window.saveCurrentLanguageCanvas(); alert(currentEditingLanguage.toUpperCase()+' dili kaydedildi'); });
     document.getElementById('textTool').addEventListener('click', function(){ const text=new fabric.IText('Metin', { left:100, top:100, fontFamily:document.getElementById('textFont').value, fontSize:parseInt(document.getElementById('textSize').value), fill:document.getElementById('textColor').value, fontWeight:document.getElementById('textBold').checked?'bold':'normal' }); canvas.add(text); canvas.setActiveObject(text); text.enterEditing(); });

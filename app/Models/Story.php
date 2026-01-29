@@ -60,6 +60,20 @@ class Story extends Model implements TranslatableContract
         return $translatedImage ? asset('storage/' . $translatedImage) : null;
     }
 
+    /**
+     * Get edited images for all locales
+     */
+    public function getEditedImagesAttribute(): array
+    {
+        $images = [];
+        foreach ($this->translations as $translation) {
+            if ($translation->image) {
+                $images[$translation->locale] = asset('storage/' . $translation->image);
+            }
+        }
+        return $images;
+    }
+
     // Relationships
     public function model3d(): BelongsTo
     {
