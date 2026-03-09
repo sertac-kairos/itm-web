@@ -451,9 +451,9 @@ document.addEventListener('DOMContentLoaded', function() {
         
         try {
             const dataURL = canvas.toDataURL({
-                format: 'png',
-                quality: 1,
-                multiplier: 2
+                format: 'jpeg',
+                quality: 0.75,
+                multiplier: 1
             });
             
             languageCanvasData[currentEditingLanguage] = dataURL;

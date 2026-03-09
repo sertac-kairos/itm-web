@@ -138,12 +138,18 @@ class OnboardingSlideController extends Controller
      */
     private function saveCanvasAsImage(string $dataURL): string
     {
+        // Detect format from data URL (jpeg or png)
+        $format = 'jpg';
+        if (str_contains($dataURL, 'data:image/png')) {
+            $format = 'png';
+        }
+        
         // Remove data URL prefix
         $data = substr($dataURL, strpos($dataURL, ',') + 1);
         $data = base64_decode($data);
         
-        // Generate unique filename
-        $filename = 'onboarding/' . uniqid('canvas_') . '.png';
+        // Generate unique filename with correct extension
+        $filename = 'onboarding/' . uniqid('canvas_') . '.' . $format;
         
         // Save to storage
         Storage::disk('public')->put($filename, $data);

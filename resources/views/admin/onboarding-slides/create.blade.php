@@ -226,12 +226,12 @@
                             <div class="canvas-info mt-2">
                                 <small class="text-muted">
                                     <i class="mdi mdi-information-outline me-1"></i>
-                                    Canvas boyutu: 400x600px (Dikey format)
+                                    Canvas boyutu: 400x600px (Dikey format) | Format: JPEG (Quality: 75%) - Optimize edildi
                                 </small>
                             </div>
                             <div class="alert alert-info mt-3">
                                 <i class="mdi mdi-lightbulb-on me-2"></i>
-                                <strong>Önemli:</strong> Form gönderildiğinde editördeki görselin son hali (metin ve eklenen görseller dahil) otomatik olarak kaydedilecektir.
+                                <strong>Önemli:</strong> Form gönderildiğinde editördeki görselin son hali (metin ve eklenen görseller dahil) otomatik olarak kaydedilecektir. Görseller optimize edilmiş kalitede kaydedilir.
                             </div>
                         </div>
 
@@ -507,9 +507,9 @@ document.addEventListener('DOMContentLoaded', function() {
         
         try {
             const dataURL = canvas.toDataURL({
-                format: 'png',
-                quality: 1,
-                multiplier: 2
+                format: 'jpeg',
+                quality: 0.75,
+                multiplier: 1
             });
             languageCanvasData[currentEditingLanguage] = dataURL;
             // Also update global reference
