@@ -277,11 +277,17 @@ class StoryController extends Controller
      */
     private function saveCanvasAsImage(string $dataURL, string $locale): string
     {
+        // Detect format from data URL (jpeg or png)
+        $format = 'jpg';
+        if (str_contains($dataURL, 'data:image/png')) {
+            $format = 'png';
+        }
+        
         $commaPos = strpos($dataURL, ',');
         $data = $commaPos !== false ? substr($dataURL, $commaPos + 1) : $dataURL;
         $binary = base64_decode($data);
         $directory = "stories/images/{$locale}";
-        $filename = $directory . '/' . uniqid('canvas_') . '.png';
+        $filename = $directory . '/' . uniqid('canvas_') . '.' . $format;
         Storage::disk('public')->put($filename, $binary);
         return $filename;
     }

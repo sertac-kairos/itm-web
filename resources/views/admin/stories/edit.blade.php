@@ -240,6 +240,12 @@
 
                         <div class="text-center">
                             <canvas id="fabricCanvas" width="400" height="600" style="border:2px solid #ddd;border-radius:8px"></canvas>
+                            <div class="mt-2">
+                                <small class="text-muted">
+                                    <i class="mdi mdi-information-outline me-1"></i>
+                                    Canvas boyutu: 400x600px | Format: JPEG (Quality: 75%) - Optimize edildi
+                                </small>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -521,7 +527,7 @@ document.addEventListener('DOMContentLoaded', function(){
                 const tempCtx = tempCanvas.getContext('2d');
                 tempCtx.drawImage(img, 0, 0);
                 try {
-                    const dataURL = tempCanvas.toDataURL('image/png');
+                    const dataURL = tempCanvas.toDataURL('image/jpeg', 0.75);
                     languageCanvasData[locale] = dataURL;
                     // Also store in hidden input
                     const hidden = document.getElementById('editedImageData_' + locale);
@@ -594,7 +600,7 @@ document.addEventListener('DOMContentLoaded', function(){
 
     window.saveCurrentLanguageCanvas = function(){ 
         try { 
-            const dataURL = canvas.toDataURL({ format:'png', quality:1, multiplier:2 }); 
+            const dataURL = canvas.toDataURL({ format:'jpeg', quality:0.75, multiplier:1 }); 
             languageCanvasData[currentEditingLanguage]=dataURL; 
             const hidden=document.getElementById('editedImageData_'+currentEditingLanguage); 
             if(hidden){ hidden.value=dataURL; } 
@@ -703,7 +709,7 @@ document.addEventListener('DOMContentLoaded', function(){
             const tempCtx = tempCanvas.getContext('2d');
             tempCtx.drawImage(img, 0, 0);
             try {
-                const dataURL = tempCanvas.toDataURL('image/png');
+                const dataURL = tempCanvas.toDataURL('image/jpeg', 0.75);
                 languageCanvasData[locale] = dataURL;
                 const hidden = document.getElementById('editedImageData_' + locale);
                 if (hidden) {
