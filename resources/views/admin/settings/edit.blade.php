@@ -72,13 +72,28 @@
                                     placeholder="https://instagram.com/...">
                                 @error('instagram_url')<div class="invalid-feedback">{{ $message }}</div>@enderror
                             </div>
-                            <div class="mb-0">
+                            <div class="mb-3">
                                 <label class="form-label" for="email_address">Mail Adresi</label>
                                 <input type="email" class="form-control @error('email_address') is-invalid @enderror"
                                     id="email_address" name="email_address"
                                     value="{{ old('email_address', $settings['email_address']) }}"
                                     placeholder="info@domain.com">
                                 @error('email_address')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                            </div>
+                            <div class="mb-0">
+                                <label class="form-label" for="app_store_url">
+                                    App Store URL
+                                    <small class="text-muted">(Yönlendirme: /appStoreUrl)</small>
+                                </label>
+                                <input type="url" class="form-control @error('app_store_url') is-invalid @enderror"
+                                    id="app_store_url" name="app_store_url"
+                                    value="{{ old('app_store_url', $settings['app_store_url']) }}"
+                                    placeholder="https://apps.apple.com/...">
+                                @error('app_store_url')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                                <div class="form-text">
+                                    <i class="mdi mdi-information-outline me-1"></i>
+                                    Kullanıcılar /appStoreUrl adresine gittiklerinde bu URL'e yönlendirilecek
+                                </div>
                             </div>
                         </div>
                     </div>

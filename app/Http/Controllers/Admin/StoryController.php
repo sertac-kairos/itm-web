@@ -95,7 +95,7 @@ class StoryController extends Controller
                 $translationRules["{$locale}.title"] = 'required|string|max:255';
                 $translationRules["{$locale}.description"] = 'nullable|string';
                 $translationRules["{$locale}.image"] = 'nullable|image|max:4096';
-                $translationRules["{$locale}.edited_image_data"] = 'nullable|string';
+                $translationRules["{$locale}.edited_image_data"] = 'nullable|string|max:2000000'; // ~2MB base64
             }
         }
         if (!$hasAtLeastOne) {
@@ -103,6 +103,19 @@ class StoryController extends Controller
         }
         if (!empty($translationRules)) {
             $request->validate($translationRules);
+        }
+        
+        // Check base64 image sizes
+        foreach (config('translatable.locales') as $locale) {
+            if ($request->filled("{$locale}.edited_image_data")) {
+                $dataSize = strlen($request->input("{$locale}.edited_image_data"));
+                \Log::info("Story create - {$locale} canvas data size: " . number_format($dataSize) . " bytes");
+                if ($dataSize > 2000000) {
+                    return back()->withErrors([
+                        'canvas' => "{$locale} dili için görsel çok büyük. Lütfen daha küçük bir görsel kullanın veya kaliteyi düşürün."
+                    ])->withInput();
+                }
+            }
         }
 
         $thumbnailPath = null;
@@ -186,7 +199,7 @@ class StoryController extends Controller
                 $translationRules["{$locale}.title"] = 'required|string|max:255';
                 $translationRules["{$locale}.description"] = 'nullable|string';
                 $translationRules["{$locale}.image"] = 'nullable|image|max:4096';
-                $translationRules["{$locale}.edited_image_data"] = 'nullable|string';
+                $translationRules["{$locale}.edited_image_data"] = 'nullable|string|max:2000000'; // ~2MB base64
             }
         }
         if (!$hasAtLeastOne) {
@@ -194,6 +207,19 @@ class StoryController extends Controller
         }
         if (!empty($translationRules)) {
             $request->validate($translationRules);
+        }
+        
+        // Check base64 image sizes
+        foreach (config('translatable.locales') as $locale) {
+            if ($request->filled("{$locale}.edited_image_data")) {
+                $dataSize = strlen($request->input("{$locale}.edited_image_data"));
+                \Log::info("Story update - {$locale} canvas data size: " . number_format($dataSize) . " bytes");
+                if ($dataSize > 2000000) {
+                    return back()->withErrors([
+                        'canvas' => "{$locale} dili için görsel çok büyük. Lütfen daha küçük bir görsel kullanın veya kaliteyi düşürün."
+                    ])->withInput();
+                }
+            }
         }
 
         // Handle main thumbnail

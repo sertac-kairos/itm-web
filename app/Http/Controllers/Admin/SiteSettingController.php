@@ -22,6 +22,7 @@ class SiteSettingController extends Controller
             'linkedin_url' => AppSetting::get('linkedin_url'),
             'instagram_url' => AppSetting::get('instagram_url'),
             'email_address' => AppSetting::get('email_address'),
+            'app_store_url' => AppSetting::get('app_store_url', 'https://www.apple.com/uk/app-store/'),
             'timeline_image_json' => AppSetting::get('timeline_image_json'),
             'izmir_kalkinma_ajansi_logo' => AppSetting::get('izmir_kalkinma_ajansi_logo'),
             'sanayi_teknoloji_bakanligi_logo' => AppSetting::get('sanayi_teknoloji_bakanligi_logo'),
@@ -76,6 +77,7 @@ class SiteSettingController extends Controller
             'linkedin_url' => 'nullable|url|max:255',
             'instagram_url' => 'nullable|url|max:255',
             'email_address' => 'nullable|email|max:255',
+            'app_store_url' => 'nullable|url|max:500',
             'timeline_image_json' => 'nullable|json',
             'izmir_kalkinma_ajansi_logo' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:1024',
             'sanayi_teknoloji_bakanligi_logo' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:1024',
@@ -106,6 +108,7 @@ class SiteSettingController extends Controller
         AppSetting::set('linkedin_url', $validated['linkedin_url'] ?? null);
         AppSetting::set('instagram_url', $validated['instagram_url'] ?? null);
         AppSetting::set('email_address', $validated['email_address'] ?? null);
+        AppSetting::set('app_store_url', $validated['app_store_url'] ?? 'https://www.apple.com/uk/app-store/');
         AppSetting::set('timeline_image_json', $validated['timeline_image_json'] ?? null);
 
         // Handle logo uploads

@@ -118,6 +118,12 @@ Route::get('/', function () {
     return view('welcome');
 })->name('root');
 
+
+Route::get('/appStoreUrl', function () {
+    $appStoreUrl = \App\Models\AppSetting::get('app_store_url', 'https://www.apple.com/uk/app-store/');
+    return redirect()->away($appStoreUrl);
+})->name('app-store-redirect');
+
 // Public Support page
 Route::get('/support', [SupportController::class, 'showForm'])->name('support.form');
 Route::post('/support', [SupportController::class, 'submit'])->name('support.submit');
@@ -146,3 +152,5 @@ Route::get('{first}/{second}', [RoutingController::class, 'secondLevel'])
 Route::get('{any}', [RoutingController::class, 'root'])
     ->where('any', '^(?!admin|api).*')
     ->name('any');
+
+
