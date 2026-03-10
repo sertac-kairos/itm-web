@@ -190,7 +190,7 @@
                             <div class="mt-2">
                                 <small class="text-muted">
                                     <i class="mdi mdi-information-outline me-1"></i>
-                                    Canvas boyutu: 300x450px | Format: JPEG (Quality: 50%) - Yüksek optimizasyon
+                                    Canvas boyutu: 400x600px | Format: JPEG (Quality: 75%) - Optimize edildi
                                 </small>
                             </div>
                         </div>
@@ -402,24 +402,10 @@ function saveCanvasData() {
     if (typeof saveCurrentLanguageCanvas === 'function') { saveCurrentLanguageCanvas(); }
     const locales = @json($locales);
     let ok = false;
-    let totalSize = 0;
     locales.forEach(function(locale){
         const hidden = document.getElementById('editedImageData_'+locale);
-        if (hidden && hidden.value && hidden.value.startsWith('data:image/')) { 
-            ok = true; 
-            totalSize += hidden.value.length;
-        }
+        if (hidden && hidden.value && hidden.value.startsWith('data:image/')) { ok = true; }
     });
-    
-    if (totalSize > 0) {
-        const totalSizeInMB = (totalSize / (1024 * 1024)).toFixed(2);
-        console.log(`Total canvas data size: ${totalSizeInMB}MB`);
-        
-        if (totalSize > 5000000) { // 5MB total
-            alert(`⚠️ UYARI: Toplam görsel boyutu çok büyük (${totalSizeInMB}MB)!\n\nÖnerilen maksimum: 5MB\nForm gönderilebilir ama sunucu reddetme riski var.`);
-        }
-    }
-    
     return true; // allow submit even if no canvas, server will validate title
 }
 
@@ -491,29 +477,7 @@ document.addEventListener('DOMContentLoaded', function(){
         img.src=URL.createObjectURL(file); 
     });
 
-    window.saveCurrentLanguageCanvas = function(){ 
-        if(backgroundImage){ 
-            try { 
-                const dataURL = canvas.toDataURL({ format:'jpeg', quality:0.5, multiplier:0.75 }); 
-                const sizeInBytes = dataURL.length;
-                const sizeInKB = Math.round(sizeInBytes / 1024);
-                const sizeInMB = (sizeInBytes / (1024 * 1024)).toFixed(2);
-                
-                console.log(`Canvas size for ${currentEditingLanguage}: ${sizeInKB}KB (${sizeInMB}MB)`);
-                
-                if (sizeInBytes > 2000000) {
-                    alert(`⚠️ UYARI: ${currentEditingLanguage.toUpperCase()} görseli çok büyük (${sizeInMB}MB)!\n\nSunucu limiti: 2MB\nLütfen daha küçük bir görsel kullanın veya görseli crop edin.`);
-                    return;
-                }
-                
-                languageCanvasData[currentEditingLanguage]=dataURL; 
-                const hidden=document.getElementById('editedImageData_'+currentEditingLanguage); 
-                if(hidden){ hidden.value=dataURL; } 
-            } catch(e){
-                console.error('Canvas save error:', e);
-            } 
-        } 
-    };
+    window.saveCurrentLanguageCanvas = function(){ if(backgroundImage){ try { const dataURL = canvas.toDataURL({ format:'jpeg', quality:0.75, multiplier:1 }); languageCanvasData[currentEditingLanguage]=dataURL; const hidden=document.getElementById('editedImageData_'+currentEditingLanguage); if(hidden){ hidden.value=dataURL; } } catch(e){} } };
     function loadLanguageCanvas(){
         canvas.clear();
         canvas.backgroundColor='#ffffff';
@@ -550,14 +514,7 @@ document.addEventListener('DOMContentLoaded', function(){
         canvas.renderAll();
     }
 
-    document.getElementById('saveToLanguage').addEventListener('click', function(){ 
-        window.saveCurrentLanguageCanvas(); 
-        if (languageCanvasData[currentEditingLanguage]) {
-            const sizeInBytes = languageCanvasData[currentEditingLanguage].length;
-            const sizeInKB = Math.round(sizeInBytes / 1024);
-            alert(`✅ ${currentEditingLanguage.toUpperCase()} dili kaydedildi!\n\nBoyut: ${sizeInKB}KB`);
-        }
-    });
+    document.getElementById('saveToLanguage').addEventListener('click', function(){ window.saveCurrentLanguageCanvas(); alert(currentEditingLanguage.toUpperCase()+' dili kaydedildi'); });
     document.getElementById('textTool').addEventListener('click', function(){ const text=new fabric.IText('Metin', { left:100, top:100, fontFamily:document.getElementById('textFont').value, fontSize:parseInt(document.getElementById('textSize').value), fill:document.getElementById('textColor').value, fontWeight:document.getElementById('textBold').checked?'bold':'normal' }); canvas.add(text); canvas.setActiveObject(text); text.enterEditing(); });
     document.getElementById('imageTool').addEventListener('click', function(){ const input=document.createElement('input'); input.type='file'; input.accept='image/*'; input.onchange=function(e){ const file=e.target.files[0]; if(file){ const reader=new FileReader(); reader.onload=function(ev){ fabric.Image.fromURL(ev.target.result, function(img){ img.scaleToWidth(100); img.set({ left:100, top:100, selectable:true }); canvas.add(img); canvas.setActiveObject(img); canvas.renderAll(); }); }; reader.readAsDataURL(file); } }; input.click(); });
     document.getElementById('textFont').addEventListener('change', function(){ const obj=canvas.getActiveObject(); if(obj && obj.type==='i-text'){ obj.set('fontFamily', this.value); canvas.renderAll(); } });
