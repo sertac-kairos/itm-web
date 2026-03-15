@@ -13,6 +13,7 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->append(\App\Http\Middleware\EnsureAdminExists::class);
+        $middleware->append(\App\Http\Middleware\LogRequestDuration::class);
         // Apply signature check and locale parsing to API routes
         $middleware->api(append: [
             \App\Http\Middleware\SetLocaleFromHeader::class,
